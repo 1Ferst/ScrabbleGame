@@ -5,8 +5,8 @@ from game import Game
 def main():
     pygame.init()
     screen = pygame.display.set_mode((800, 800))
+    clock = pygame.time.Clock()
     pygame.display.set_caption("Scrabble")
-
     game = Game(screen)
 
     running = True

@@ -1,11 +1,11 @@
 import pygame
-from board import Board
+from board import GameBoard
 from player import Player
 
 class Game:
     def __init__(self, screen):
         self.screen = screen
-        self.board = Board()
+        self.board = GameBoard()
         self.players = [Player("Player 1"), Player("Player 2")]
         self.current_player_index = 0
 

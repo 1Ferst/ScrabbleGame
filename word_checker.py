@@ -7,3 +7,4 @@ polish_dictionary = load_dictionary()
 def is_word_valid(word):
     return word.lower() in polish_dictionary
 
+

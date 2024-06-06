@@ -1,85 +1,50 @@
 import pygame
-import copy
 from tile import Tile
 
+COLORS = {
+    'L2': (139, 200, 234),
+    'L3': (34, 134, 189),
+    'S2': (255, 192, 203),
+    'S3': (192, 89, 77),
+    'S4': (226, 21, 21),
+    'default': (197, 197, 210)
+}
 
-class GameBoard:
+class Board:
     def __init__(self):
-        row_1 = [
-            Tile(modifier="S4"), Tile(), Tile(), Tile(modifier="L2"), Tile(),
-            Tile(), Tile(), Tile(modifier="S3"), Tile(), Tile(),
-            Tile(), Tile(modifier="L2"), Tile(), Tile(), Tile(modifier="S4")
-        ]
+        self.grid = self.create_board()
 
-        row_2 = [
-            Tile(), Tile(modifier="S2"), Tile(), Tile(), Tile(),
-            Tile(modifier="L3"), Tile(), Tile(), Tile(), Tile(modifier="L3"),
-            Tile(), Tile(), Tile(), Tile(modifier="S2"), Tile()
-        ]
-
-        row_3 = [
-            Tile(), Tile(), Tile(modifier="S2"), Tile(), Tile(),
-            Tile(), Tile(modifier="L2"), Tile(), Tile(modifier="L2"), Tile(),
-            Tile(), Tile(), Tile(modifier="S2"), Tile(), Tile()
-        ]
-
-        row_4 = [
-            Tile(modifier="L2"), Tile(), Tile(), Tile(modifier="S2"), Tile(),
-            Tile(), Tile(), Tile(modifier="L2"), Tile(), Tile(),
-            Tile(), Tile(modifier="S2"), Tile(), Tile(), Tile(modifier="L2")
-        ]
-
-        row_5 = [
-            Tile(), Tile(), Tile(), Tile(), Tile(modifier="S2"),
-            Tile(), Tile(), Tile(), Tile(), Tile(),
-            Tile(modifier="S2"), Tile(), Tile(), Tile(), Tile()
-        ]
-
-        row_6 = [
-            Tile(), Tile(modifier="L3"), Tile(), Tile(), Tile(),
-            Tile(modifier="L3"), Tile(), Tile(), Tile(), Tile(modifier="L3"),
-            Tile(), Tile(), Tile(), Tile(modifier="L3"), Tile()
-        ]
-
-        row_7 = [
-            Tile(), Tile(), Tile(modifier="L2"), Tile(), Tile(),
-            Tile(), Tile(modifier="L2"), Tile(), Tile(modifier="L2"), Tile(),
-            Tile(), Tile(), Tile(modifier="L2"), Tile(), Tile()
-        ]
-
-        row_8 = [
-            Tile(modifier="S3"), Tile(), Tile(), Tile(modifier="L2"), Tile(),
-            Tile(), Tile(), Tile(modifier="S2"), Tile(), Tile(),
-            Tile(), Tile(modifier="L2"), Tile(), Tile(), Tile(modifier="S3")
-        ]
-
-        row_9 = copy.deepcopy(row_7)
-        row_10 = copy.deepcopy(row_6)
-        row_11 = copy.deepcopy(row_5)
-        row_12 = copy.deepcopy(row_4)
-        row_13 = copy.deepcopy(row_3)
-        row_14 = copy.deepcopy(row_2)
-        row_15 = copy.deepcopy(row_1)
-
-        self.board = [
-            row_1, row_2, row_3, row_4, row_5, row_6, row_7, row_8,
-            row_9, row_10, row_11, row_12, row_13, row_14, row_15
-        ]
-
-        self.words_on_board = []
-
-        self.letter_bag = ['A']*9 + ['E']*7 + ['I']*8 + ['N']*5 + ['O']*6 + ['R']*4 + ['S']*4 + ['W']*4 + ['Z']*5 + \
-                          ['C']*3 + ['D']*3 + ['K']*3 + ['L']*3 + ['M']*3 + ['P']*3 + ['T']*3 + \
-                          ['Y']*4 + ['B']*2 + ['G']*2 + ['H']*2 + ['J']*2 + ['Ł']*2 + ['U']*2 + ['Ą']*1 + \
-                          ['Ę']*1 + ['F']*1 + ['Ó']*1 + ['Ś']*1 + ['Ż']*1 + ['Ć']*1 + ['Ń']*1 + ['Ź']*1 + ['blank']*2
-
-        self.letter_points = {
-            'A': 1, 'E': 1, 'I': 1, 'N': 1, 'O': 1, 'R': 1, 'S': 1, 'W': 1, 'Z': 1,
-            'C': 2, 'D': 2, 'K': 2, 'L': 2, 'M': 2, 'P': 2, 'T': 2, 'Y': 2,
-            'B': 3, 'G': 3, 'H': 3, 'J': 3, 'Ł': 3, 'U': 3,
-            'Ą': 5, 'Ę': 5, 'F': 5, 'Ó': 5, 'Ś': 5, 'Ż': 5,
-            'Ć': 6, 'Ń': 7, 'Ź': 9, 'blank': 0
+    def create_board(self):
+        grid = [[Tile() for _ in range(15)] for _ in range(15)]
+        special_tiles = {
+            (0, 0): 'S4', (0, 3): 'L2', (0, 7): 'S3', (0, 11): 'L2', (0, 14): 'S4',
+            (1, 1): 'S2', (1, 5): 'L3', (1, 9): 'L3', (1, 13): 'S2',
+            (2, 2): 'S2', (2, 6): 'L2', (2, 8): 'L2', (2, 12): 'S2',
+            (3, 0): 'L2', (3, 3): 'S2', (3, 7): 'L2', (3, 11): 'S2', (3, 14): 'L2',
+            (4, 4): 'S2', (4, 10): 'S2',
+            (5, 1): 'L3', (5, 5): 'L3', (5, 9): 'L3', (5, 13): 'L3',
+            (6, 2): 'L2', (6, 6): 'L2', (6, 8): 'L2', (6, 12): 'L2',
+            (7, 0): 'S3', (7, 3): 'L2', (7, 7): 'S2', (7, 11): 'L2', (7, 14): 'S3',
+            (8, 2): 'L2', (8, 6): 'L2', (8, 8): 'L2', (8, 12): 'L2',
+            (9, 1): 'L3', (9, 5): 'L3', (9, 9): 'L3', (9, 13): 'L3',
+            (10, 4): 'S2', (10, 10): 'S2',
+            (11, 0): 'L2', (11, 3): 'S2', (11, 7): 'L2', (11, 11): 'S2', (11, 14): 'L2',
+            (12, 2): 'S2', (12, 6): 'L2', (12, 8): 'L2', (12, 12): 'S2',
+            (13, 1): 'S2', (13, 5): 'L3', (13, 9): 'L3', (13, 13): 'S2',
+            (14, 0): 'S4', (14, 3): 'L2', (14, 7): 'S3', (14, 11): 'L2', (14, 14): 'S4'
         }
 
+        for (y, x), bonus in special_tiles.items():
+            grid[y][x] = Tile(modifier=bonus, color=COLORS[bonus])
 
+        return grid
 
+    def draw(self, screen):
+        for y in range(15):
+            for x in range(15):
+                rect = pygame.Rect(x * 40, y * 40, 40, 40)
+                self.grid[y][x].rect.topleft = rect.topleft
+                self.grid[y][x].draw(screen, rect.topleft)
+
+    def place_tile(self, x, y, letter):
+        self.grid[y][x] = Tile(letter=letter, color=(55, 55, 55))

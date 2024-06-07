@@ -14,7 +14,7 @@ class Board:
     def __init__(self):
         self.grid = self.create_board()
         self.score_font = pygame.font.Font(None, 32)
-        self.rack = []
+
 
     def create_board(self):
         special_tiles = {
@@ -73,5 +73,6 @@ class Board:
         # Rysowanie całkowitego wyniku na dole prostokąta
         total_score = self.score_font.render(f"Total Score: {player_score}", True, (0, 0, 0))
         screen.blit(total_score, (x_start + 20, 560))
+
 
 

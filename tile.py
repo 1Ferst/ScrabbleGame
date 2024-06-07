@@ -47,3 +47,4 @@ class Tile:
         # Rysowanie płytki na ekranie w określonej pozycji
         self.shape = self.create_shape()
         screen.blit(self.shape, pos)
+

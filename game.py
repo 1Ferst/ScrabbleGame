@@ -17,10 +17,13 @@ class Game:
         pygame.display.set_caption("Scrabble")
         self.board = Board()
         self.letter_values = LETTER_VALUES
+        self.player_score = 0
+
 
     def draw_game(self):
-        self.screen.fill((255,255,255))
+        self.screen.fill((255, 255, 255))
         self.board.draw(self.screen)
+        self.board.draw_player_score(self.screen, self.player_score)
         pygame.display.flip()
 
     def run(self):

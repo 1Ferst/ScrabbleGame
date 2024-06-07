@@ -7,12 +7,13 @@ COLORS = {
     'S2': (255, 192, 203),
     'S3': (192, 89, 77),
     'S4': (226, 21, 21),
-    'default': (197, 197, 210)
+    'default': (197, 197, 210),
 }
 
 class Board:
     def __init__(self):
         self.grid = self.create_board()
+        self.score_font = pygame.font.Font(None, 32)
 
     def create_board(self):
         special_tiles = {
@@ -56,3 +57,19 @@ class Board:
 
     def place_tile(self, x, y, letter):
         self.grid[y][x] = Tile(letter=letter, color=(55, 55, 55))
+
+    def draw_player_score(self, screen, player_score):
+        x_start = 610  # Prawa strona planszy, szerokość tablicy to 600, więc zaczynamy od 610
+
+        # Rysowanie prostokąta dla wyników
+        pygame.draw.rect(screen, (173, 216, 230), [x_start, 0, 180, 600])
+
+        # Rysowanie tytułu "Your Points"
+        score_title = self.score_font.render("Your Points", True, (0, 0, 0))
+        screen.blit(score_title, (x_start + 20, 20)) # jedna powierzchnia jest kopiowana na druga
+
+        # Miejsce na wyniki gracza (później można tu dodawać wyniki)
+        # Rysowanie całkowitego wyniku na dole prostokąta
+        total_score = self.score_font.render(f"Total Score: {player_score}", True, (0, 0, 0))
+        screen.blit(total_score, (x_start + 20, 560))
+

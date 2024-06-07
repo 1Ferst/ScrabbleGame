@@ -1,5 +1,7 @@
 import pygame
 from board import Board
+from bag import Bag
+from player_rack import PlayerRack
 
 LETTER_VALUES = {
             'A': 1, 'Ą': 5, 'B': 3, 'C': 2, 'Ć': 6, 'D': 2, 'E': 1, 'Ę': 5,
@@ -16,6 +18,8 @@ class Game:
         self.screen = pygame.display.set_mode((800, 800))
         pygame.display.set_caption("Scrabble")
         self.board = Board()
+        self.bag = Bag()
+        self.player_rack = PlayerRack(self.bag)
         self.letter_values = LETTER_VALUES
         self.player_score = 0
 
@@ -24,7 +28,9 @@ class Game:
         self.screen.fill((255, 255, 255))
         self.board.draw(self.screen)
         self.board.draw_player_score(self.screen, self.player_score)
+        self.player_rack.draw(self.screen)
         pygame.display.flip()
+
 
     def run(self):
         running = True
@@ -32,7 +38,15 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Lewy przycisk myszy
+                        clicked_tile = self.player_rack.get_tile_at_position(event.pos)
+                        if clicked_tile:
+                            self.player_rack.remove_tile(clicked_tile)
+                            # Umieść klikniętą literę na planszy (przykładowo na pozycji 0, 0)
+                            self.board.place_tile(0, 0, clicked_tile)
+            self.player_rack.refill_rack()
             self.draw_game()
 
-    pygame.quit()
+
+        pygame.quit()

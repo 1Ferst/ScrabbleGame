@@ -14,6 +14,7 @@ class Board:
     def __init__(self):
         self.grid = self.create_board()
         self.score_font = pygame.font.Font(None, 32)
+        self.rack = []
 
     def create_board(self):
         special_tiles = {
@@ -62,7 +63,7 @@ class Board:
         x_start = 610  # Prawa strona planszy, szerokość tablicy to 600, więc zaczynamy od 610
 
         # Rysowanie prostokąta dla wyników
-        pygame.draw.rect(screen, (173, 216, 230), [x_start, 0, 180, 600])
+        pygame.draw.rect(screen, (205, 133, 63), [x_start, 0, 180, 600])
 
         # Rysowanie tytułu "Your Points"
         score_title = self.score_font.render("Your Points", True, (0, 0, 0))
@@ -72,4 +73,5 @@ class Board:
         # Rysowanie całkowitego wyniku na dole prostokąta
         total_score = self.score_font.render(f"Total Score: {player_score}", True, (0, 0, 0))
         screen.blit(total_score, (x_start + 20, 560))
+
 

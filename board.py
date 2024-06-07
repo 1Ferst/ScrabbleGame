@@ -15,7 +15,6 @@ class Board:
         self.grid = self.create_board()
 
     def create_board(self):
-        grid = [[Tile() for _ in range(15)] for _ in range(15)]
         special_tiles = {
             (0, 0): 'S4', (0, 3): 'L2', (0, 7): 'S3', (0, 11): 'L2', (0, 14): 'S4',
             (1, 1): 'S2', (1, 5): 'L3', (1, 9): 'L3', (1, 13): 'S2',
@@ -34,8 +33,17 @@ class Board:
             (14, 0): 'S4', (14, 3): 'L2', (14, 7): 'S3', (14, 11): 'L2', (14, 14): 'S4'
         }
 
-        for (y, x), bonus in special_tiles.items():
-            grid[y][x] = Tile(modifier=bonus, color=COLORS[bonus])
+        grid = []
+        for y in range(15):
+            row = []
+            for x in range(15):
+                if (y, x) in special_tiles:
+                    modifier = special_tiles[(y, x)]
+                    color = COLORS[modifier]
+                    row.append(Tile(modifier=modifier, color=color))
+                else:
+                    row.append(Tile())
+            grid.append(row)
 
         return grid
 

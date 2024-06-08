@@ -57,13 +57,16 @@ class Game:
                         if 0 <= grid_x < 15 and 0 <= grid_y < 15:
                             self.board.place_tile(grid_x, grid_y, self.dragging_tile)
                         else:
-                            self.player_rack.rack.append(self.dragging_tile)
+                            self.player_rack.rack.append(self.dragging_tile) #
+                            # zmienic na insert zeby przywrocic kafelek na poprzednia pozycja jesli upuscimy poza plansze
+                            # lub wcale nie zmieniac pozycji reszty kafelkow do zakonczenia tury
                         self.dragging_tile = None
                 elif event.type == pygame.MOUSEMOTION:
                     if self.dragging_tile:
                         self.draw_game()
 
             self.player_rack.refill_rack()
+            # uzupelniac dopiero po zakonczeniu rundy lub w przypadku wymiany liter
             self.draw_game()
 
         pygame.quit()

@@ -10,11 +10,11 @@ COLORS = {
     'default': (197, 197, 210),
 }
 
+
 class Board:
     def __init__(self):
         self.grid = self.create_board()
         self.score_font = pygame.font.Font(None, 32)
-
 
     def create_board(self):
         special_tiles = {
@@ -56,8 +56,8 @@ class Board:
                 self.grid[y][x].rect.topleft = rect.topleft
                 self.grid[y][x].draw(screen, rect.topleft)
 
-    def place_tile(self, x, y, letter):
-        self.grid[y][x] = Tile(letter=letter, color=(55, 55, 55))
+    def place_tile(self, x, y, tile):
+        self.grid[y][x] = tile
 
     def draw_player_score(self, screen, player_score):
         x_start = 610  # Prawa strona planszy, szerokość tablicy to 600, więc zaczynamy od 610

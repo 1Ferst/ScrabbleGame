@@ -1,11 +1,12 @@
 import pygame
 
+
 class Tile:
     def __init__(self, letter=None, value=None, modifier=None, color=(197, 197, 210), text_color=(0, 0, 0), font_size=32, border_color=(0, 0, 0)):
         self.letter = letter
         self.value = value
         self.modifier = modifier
-        self.color = color # Kolor prostokąta
+        self.color = color  # Kolor prostokąta
         self.text_color = text_color  # Kolor tekstu
         self.font_size = font_size  # Rozmiar czcionki
         self.border_color = border_color
@@ -24,7 +25,7 @@ class Tile:
     def create_shape(self):
         # Prostokąt, który opisuje granice obrazu płytki
         surface = pygame.Surface((self.tile_width, self.tile_height))
-        surface.fill(self.color) # Wypełnienie powierzchni kolorem prostokąta
+        surface.fill(self.color)  # Wypełnienie powierzchni kolorem prostokąta
         # Rysowanie obramowania
         pygame.draw.rect(surface, self.border_color, surface.get_rect(), 1)
         if self.letter:
@@ -47,4 +48,3 @@ class Tile:
         # Rysowanie płytki na ekranie w określonej pozycji
         self.shape = self.create_shape()
         screen.blit(self.shape, pos)
-

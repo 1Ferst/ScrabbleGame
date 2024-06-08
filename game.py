@@ -26,6 +26,7 @@ class Game:
         self.dragging_tile = None
         self.dragging_offset_x = 0
         self.dragging_offset_y = 0
+        self.current_turn_tiles = []
 
     def draw_game(self):
         self.screen.fill((255, 255, 255))
@@ -43,7 +44,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:  # Lewy przycisk myszy
+                    if event.button == 1:
                         clicked_tile = self.player_rack.get_tile_at_position(event.pos)
                         if clicked_tile:
                             self.dragging_tile = clicked_tile
@@ -51,22 +52,44 @@ class Game:
                             self.dragging_offset_y = event.pos[1] - clicked_tile.rect.y
                             self.player_rack.remove_tile(clicked_tile)
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    if event.button == 1 and self.dragging_tile:  # Lewy przycisk myszy
+                    if event.button == 1 and self.dragging_tile:
                         grid_x = event.pos[0] // 40
                         grid_y = event.pos[1] // 40
                         if 0 <= grid_x < 15 and 0 <= grid_y < 15:
+                            original_tile = self.board.grid[grid_y][grid_x]
                             self.board.place_tile(grid_x, grid_y, self.dragging_tile)
+                            self.current_turn_tiles.append((grid_x, grid_y, original_tile))
                         else:
-                            self.player_rack.rack.append(self.dragging_tile) #
-                            # zmienic na insert zeby przywrocic kafelek na poprzednia pozycja jesli upuscimy poza plansze
+                            self.player_rack.rack.append(self.dragging_tile)
+                            # Zmienic na insert zeby przywrocic kafelek na poprzednia pozycja jesli upuscimy poza plansze
                             # lub wcale nie zmieniac pozycji reszty kafelkow do zakonczenia tury
                         self.dragging_tile = None
                 elif event.type == pygame.MOUSEMOTION:
                     if self.dragging_tile:
                         self.draw_game()
 
+            if self.current_turn_tiles:
+                if not self.board.are_tiles_in_line(self.current_turn_tiles):
+                    print("Płytki nie są ułożone w linii prostej!")
+                    self.undo_current_turn()
+
+                valid, score = self.board.validate_and_score_words(self.current_turn_tiles)
+                if valid:
+                    self.player_score += score
+                    self.current_turn_tiles = []
+                else:
+                    print("Niepoprawne słowa!")
+                    self.undo_current_turn()
+
             self.player_rack.refill_rack()
-            # uzupelniac dopiero po zakonczeniu rundy lub w przypadku wymiany liter
+            # Uzupelniac dopiero po zakonczeniu rundy lub w przypadku wymiany liter
             self.draw_game()
 
         pygame.quit()
+
+    def undo_current_turn(self):
+        for x, y, original_tile in self.current_turn_tiles:
+            self.board.grid[y][x] = original_tile
+        self.player_rack.rack.extend(tile for _, _, tile in self.current_turn_tiles if tile)
+        self.current_turn_tiles = []
+

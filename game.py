@@ -55,9 +55,12 @@ class Game:
                         grid_x = event.pos[0] // 40
                         grid_y = event.pos[1] // 40
                         if 0 <= grid_x < 15 and 0 <= grid_y < 15:
-                            self.board.place_tile(grid_x, grid_y, self.dragging_tile)
+                            if self.board.grid[grid_y][grid_x].letter is None:  # Sprawdzenie, czy pole jest puste
+                                self.board.place_tile(grid_x, grid_y, self.dragging_tile)
+                            else:
+                                self.player_rack.rack.append(self.dragging_tile)  # Wrzucenie kafelka z powrotem na stojak
                         else:
-                            self.player_rack.rack.append(self.dragging_tile) #
+                            self.player_rack.rack.append(self.dragging_tile)
                             # zmienic na insert zeby przywrocic kafelek na poprzednia pozycja jesli upuscimy poza plansze
                             # lub wcale nie zmieniac pozycji reszty kafelkow do zakonczenia tury
                         self.dragging_tile = None

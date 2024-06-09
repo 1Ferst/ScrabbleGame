@@ -29,14 +29,14 @@ class Tile:
         pygame.draw.rect(surface, self.border_color, surface.get_rect(), 1)
         if self.letter:
             # Utworzenie tekstu na powierzchni dla litery
-            text_surface = self.font.render(self.letter, True, self.text_color)
+            text_surface = self.font.render(str(self.letter), True, self.text_color)
             # Ustawienie pozycji tekstu na środku powierzchni
             text_rect = text_surface.get_rect(center=surface.get_rect().center)
             # Narysowanie tekstu na powierzchni
             surface.blit(text_surface, text_rect)
         if self.modifier:
             # Utworzenie tekstu na powierzchni dla modyfikatora
-            modifier_surface = self.modifier_font.render(self.modifier, True, self.text_color)
+            modifier_surface = self.modifier_font.render(str(self.modifier), True, self.text_color)
             # Ustawienie pozycji tekstu na środku powierzchni
             modifier_rect = modifier_surface.get_rect(center=surface.get_rect().center)
             # Narysowanie tekstu na powierzchni
@@ -47,3 +47,4 @@ class Tile:
         # Rysowanie płytki na ekranie w określonej pozycji
         self.shape = self.create_shape()
         screen.blit(self.shape, pos)
+

@@ -10,6 +10,7 @@ COLORS = {
     'default': (197, 197, 210),
 }
 
+
 class Board:
     def __init__(self):
         self.grid = self.create_board()
@@ -55,14 +56,14 @@ class Board:
                 self.grid[y][x].rect.topleft = rect.topleft
                 self.grid[y][x].draw(screen, rect.topleft)
 
-    def place_tile(self, x, y, letter):
-        self.grid[y][x] = Tile(letter=letter, color=(55, 55, 55))
+    def place_tile(self, x, y, tile):
+        self.grid[y][x] = tile
 
     def draw_player_score(self, screen, player_score):
         x_start = 610  # Prawa strona planszy, szerokość tablicy to 600, więc zaczynamy od 610
 
         # Rysowanie prostokąta dla wyników
-        pygame.draw.rect(screen, (173, 216, 230), [x_start, 0, 180, 600])
+        pygame.draw.rect(screen, (205, 133, 63), [x_start, 0, 180, 600])
 
         # Rysowanie tytułu "Your Points"
         score_title = self.score_font.render("Your Points", True, (0, 0, 0))
@@ -72,4 +73,6 @@ class Board:
         # Rysowanie całkowitego wyniku na dole prostokąta
         total_score = self.score_font.render(f"Total Score: {player_score}", True, (0, 0, 0))
         screen.blit(total_score, (x_start + 20, 560))
+
+
 

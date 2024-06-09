@@ -22,7 +22,7 @@ class Game:
         self.player_rack = PlayerRack(self.bag)
         self.letter_values = LETTER_VALUES
         self.player_score = 0
-
+        self.player_rack.refill_rack()
         self.dragging_tile = None
         self.dragging_offset_x = 0
         self.dragging_offset_y = 0
@@ -68,7 +68,9 @@ class Game:
                     if self.dragging_tile:
                         self.draw_game()
 
-            self.player_rack.refill_rack()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:  # Naciśnięto klawisz Enter
+                        self.player_rack.refill_rack()
             # uzupelniac dopiero po zakonczeniu rundy lub w przypadku wymiany liter
             self.draw_game()
 

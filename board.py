@@ -15,6 +15,7 @@ class Board:
     def __init__(self):
         self.grid = self.create_board()
         self.score_font = pygame.font.Font(None, 32)
+        self.button_font = pygame.font.Font(None, 32)
 
     def create_board(self):
         special_tiles = {
@@ -55,7 +56,6 @@ class Board:
                 rect = pygame.Rect(x * 40, y * 40, 40, 40)
                 self.grid[y][x].rect.topleft = rect.topleft
                 self.grid[y][x].draw(screen, rect.topleft)
-
     def place_tile(self, x, y, tile):
         self.grid[y][x] = tile
 
@@ -74,6 +74,13 @@ class Board:
         total_score = self.score_font.render(f"Total Score: {player_score}", True, (0, 0, 0))
         screen.blit(total_score, (x_start + 20, 560))
 
+    def draw_confirm_button(self, screen):
+        button_rect = pygame.Rect(650, 750, 120, 40)
+        pygame.draw.rect(screen, (0, 128, 0), button_rect)  # Zielony kolor przycisku
+        pygame.draw.rect(screen, (0, 0, 0), button_rect, 2)  # Czarny obrys przycisku
+        text_surface = self.button_font.render("Zatwierdź", True, (255, 255, 255))  # Biały tekst
+        text_rect = text_surface.get_rect(center=button_rect.center)
+        screen.blit(text_surface, text_rect)
 
 
 

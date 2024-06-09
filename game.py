@@ -32,9 +32,20 @@ class Game:
         self.board.draw(self.screen)
         self.board.draw_player_score(self.screen, self.player_score)
         self.player_rack.draw(self.screen)
+        self.board.draw_confirm_button(self.screen)
         if self.dragging_tile:
             self.dragging_tile.draw(self.screen, (pygame.mouse.get_pos()[0] - self.dragging_offset_x, pygame.mouse.get_pos()[1] - self.dragging_offset_y))
         pygame.display.flip()
+
+    def check_button_click(self, pos):  # Dodane
+        button_rect = pygame.Rect(650, 750, 120, 40)
+        return button_rect.collidepoint(pos)
+
+    def end_turn(self):  # Dodane
+        # Logika zatwierdzania ruchu
+        print("Zatwierdzono ruch")
+        self.player_rack.refill_rack()
+        self.dragging_tile = None
 
     def run(self):
         running = True
@@ -44,12 +55,15 @@ class Game:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # Lewy przycisk myszy
-                        clicked_tile = self.player_rack.get_tile_at_position(event.pos)
-                        if clicked_tile:
-                            self.dragging_tile = clicked_tile
-                            self.dragging_offset_x = event.pos[0] - clicked_tile.rect.x
-                            self.dragging_offset_y = event.pos[1] - clicked_tile.rect.y
-                            self.player_rack.remove_tile(clicked_tile)
+                        if self.check_button_click(event.pos):  # Dodane
+                            self.end_turn()  # Dodane
+                        else:
+                            clicked_tile = self.player_rack.get_tile_at_position(event.pos)
+                            if clicked_tile:
+                                self.dragging_tile = clicked_tile
+                                self.dragging_offset_x = event.pos[0] - clicked_tile.rect.x
+                                self.dragging_offset_y = event.pos[1] - clicked_tile.rect.y
+                                self.player_rack.remove_tile(clicked_tile)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and self.dragging_tile:  # Lewy przycisk myszy
                         grid_x = event.pos[0] // 40

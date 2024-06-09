@@ -10,15 +10,7 @@ COLORS = {
     'default': (197, 197, 210),
 }
 
-
-class Board:
-    def __init__(self):
-        self.grid = self.create_board()
-        self.score_font = pygame.font.Font(None, 32)
-        self.button_font = pygame.font.Font(None, 32)
-
-    def create_board(self):
-        special_tiles = {
+SPECIAL_TILES = {
             (0, 0): 'S4', (0, 3): 'L2', (0, 7): 'S3', (0, 11): 'L2', (0, 14): 'S4',
             (1, 1): 'S2', (1, 5): 'L3', (1, 9): 'L3', (1, 13): 'S2',
             (2, 2): 'S2', (2, 6): 'L2', (2, 8): 'L2', (2, 12): 'S2',
@@ -36,12 +28,20 @@ class Board:
             (14, 0): 'S4', (14, 3): 'L2', (14, 7): 'S3', (14, 11): 'L2', (14, 14): 'S4'
         }
 
+class Board:
+    def __init__(self):
+        self.grid = self.create_board()
+        self.score_font = pygame.font.Font(None, 32)
+        self.button_font = pygame.font.Font(None, 32)
+
+    def create_board(self):
+
         grid = []
         for y in range(15):
             row = []
             for x in range(15):
-                if (y, x) in special_tiles:
-                    modifier = special_tiles[(y, x)]
+                if (y, x) in SPECIAL_TILES:
+                    modifier = SPECIAL_TILES[(y, x)]
                     color = COLORS[modifier]
                     row.append(Tile(modifier=modifier, color=color))
                 else:
@@ -81,6 +81,26 @@ class Board:
         text_surface = self.button_font.render("Zatwierdź", True, (255, 255, 255))  # Biały tekst
         text_rect = text_surface.get_rect(center=button_rect.center)
         screen.blit(text_surface, text_rect)
+
+    def get_tile_at_position(self, position):
+        x, y = position
+        grid_x = x // 40
+        grid_y = y // 40
+        if 0 <= grid_x < 15 and 0 <= grid_y < 15:
+            return self.grid[grid_y][grid_x]
+        return None
+
+    def remove_tile(self, tile):
+        for y in range(15):
+            for x in range(15):
+                if self.grid[y][x] == tile:
+                    modifier = None
+                    if (y, x) in SPECIAL_TILES:
+                        modifier = SPECIAL_TILES[(y, x)]
+                    color = COLORS.get(modifier, COLORS['default'])
+                    # Tworzymy nowy kafelek na planszy
+                    self.grid[y][x] = Tile(modifier=modifier, color=color)
+                    return
 
 
 

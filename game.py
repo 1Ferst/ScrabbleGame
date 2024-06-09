@@ -27,14 +27,38 @@ class Game:
         self.dragging_offset_x = 0
         self.dragging_offset_y = 0
 
+        self.current_turn_tiles = []
+
     def draw_game(self):
         self.screen.fill((255, 255, 255))
         self.board.draw(self.screen)
         self.board.draw_player_score(self.screen, self.player_score)
         self.player_rack.draw(self.screen)
+        self.board.draw_confirm_button(self.screen)
         if self.dragging_tile:
             self.dragging_tile.draw(self.screen, (pygame.mouse.get_pos()[0] - self.dragging_offset_x, pygame.mouse.get_pos()[1] - self.dragging_offset_y))
         pygame.display.flip()
+
+    def check_button_click(self, pos):
+        button_rect = pygame.Rect(650, 670, 120, 40)
+        return button_rect.collidepoint(pos)
+
+    def check_remove_button_click(self, pos):
+        remove_button_rect = pygame.Rect(650, 720, 120, 40)
+        return remove_button_rect.collidepoint(pos)
+
+    def end_turn(self):
+        # Logika zatwierdzania ruchu
+        print("Zatwierdzono ruch")
+        self.player_rack.refill_rack()
+        self.dragging_tile = None
+        self.current_turn_tiles = []
+
+    def return_tile_to_rack(self, tile):
+        if tile in self.current_turn_tiles:
+            self.player_rack.rack.append(tile)
+            self.current_turn_tiles.remove(tile)
+            self.board.remove_tile(tile)
 
     def run(self):
         running = True
@@ -44,12 +68,24 @@ class Game:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # Lewy przycisk myszy
-                        clicked_tile = self.player_rack.get_tile_at_position(event.pos)
-                        if clicked_tile:
-                            self.dragging_tile = clicked_tile
-                            self.dragging_offset_x = event.pos[0] - clicked_tile.rect.x
-                            self.dragging_offset_y = event.pos[1] - clicked_tile.rect.y
-                            self.player_rack.remove_tile(clicked_tile)
+                        if self.check_button_click(event.pos):
+                            self.end_turn()
+                        elif self.check_remove_button_click(event.pos):
+                            for tile in self.current_turn_tiles[:]:
+                                self.player_rack.rack.append(tile)
+                                self.current_turn_tiles.remove(tile)
+                                self.board.remove_tile(tile)
+                        else:
+                            clicked_tile = self.board.get_tile_at_position(event.pos)
+                            if clicked_tile:
+                                self.return_tile_to_rack(clicked_tile)
+                            else:
+                                clicked_tile = self.player_rack.get_tile_at_position(event.pos)
+                                if clicked_tile:
+                                    self.dragging_tile = clicked_tile
+                                    self.dragging_offset_x = event.pos[0] - clicked_tile.rect.x
+                                    self.dragging_offset_y = event.pos[1] - clicked_tile.rect.y
+                                    self.player_rack.remove_tile(clicked_tile)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and self.dragging_tile:  # Lewy przycisk myszy
                         grid_x = event.pos[0] // 40
@@ -57,6 +93,7 @@ class Game:
                         if 0 <= grid_x < 15 and 0 <= grid_y < 15:
                             if self.board.grid[grid_y][grid_x].letter is None:  # Sprawdzenie, czy pole jest puste
                                 self.board.place_tile(grid_x, grid_y, self.dragging_tile)
+                                self.current_turn_tiles.append(self.dragging_tile)
                             else:
                                 self.player_rack.rack.append(self.dragging_tile)  # Wrzucenie kafelka z powrotem na stojak
                         else:
@@ -71,6 +108,7 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:  # Naciśnięto klawisz Enter
                         self.player_rack.refill_rack()
+                        self.current_turn_tiles = []
             # uzupelniac dopiero po zakonczeniu rundy lub w przypadku wymiany liter
             self.draw_game()
 

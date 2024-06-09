@@ -8,6 +8,7 @@ class PlayerRack:
         self.tile_height = 40
         self.tile_spacing = 5  # Odstęp między literami
 
+
     def refill_rack(self):
         while len(self.rack) < 7:
             new_tile = self.bag.take_tile()

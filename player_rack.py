@@ -43,8 +43,8 @@ class PlayerRack:
         total_spacing_width = (len(self.rack) - 1) * self.tile_spacing
         total_width = total_tiles_width + total_spacing_width
 
-        x_offset = rack_margin + (rack_width - total_width) / 2
-        y_offset = 650
+        x_offset = rack_margin + (560 - total_width) / 2
+        y_offset = 670
 
         for tile in self.rack:
             tile.color = (255, 165, 0)  # Ustawienie koloru na żółty

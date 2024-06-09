@@ -43,6 +43,10 @@ class Game:
         button_rect = pygame.Rect(650, 670, 120, 40)
         return button_rect.collidepoint(pos)
 
+    def check_remove_button_click(self, pos):
+        remove_button_rect = pygame.Rect(650, 720, 120, 40)
+        return remove_button_rect.collidepoint(pos)
+
     def end_turn(self):
         # Logika zatwierdzania ruchu
         print("Zatwierdzono ruch")
@@ -64,8 +68,13 @@ class Game:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # Lewy przycisk myszy
-                        if self.check_button_click(event.pos):  # Dodane
-                            self.end_turn()  # Dodane
+                        if self.check_button_click(event.pos):
+                            self.end_turn()
+                        elif self.check_remove_button_click(event.pos):
+                            for tile in self.current_turn_tiles[:]:
+                                self.player_rack.rack.append(tile)
+                                self.current_turn_tiles.remove(tile)
+                                self.board.remove_tile(tile)
                         else:
                             clicked_tile = self.board.get_tile_at_position(event.pos)
                             if clicked_tile:

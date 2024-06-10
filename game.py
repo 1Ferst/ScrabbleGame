@@ -2,6 +2,7 @@ import pygame
 from board import Board
 from bag import Bag
 from player_rack import PlayerRack
+import random
 
 LETTER_VALUES = {
     'A': 1, 'Ą': 5, 'B': 3, 'C': 2, 'Ć': 6, 'D': 2, 'E': 1, 'Ę': 5,
@@ -80,6 +81,14 @@ class Game:
                                 self.player_rack.rack.append(tile)
                                 self.current_turn_tiles.remove(tile)
                                 self.board.remove_tile(tile)
+                        elif self.check_exchange_button_click(event.pos):
+                            if self.bag.tiles:  # zobaczenie czy bag nie jest pusty
+                                for tile in self.player_rack.rack[:]:
+                                    self.bag.tiles.append(tile)
+                                    self.player_rack.remove_tile(tile)
+                                random.shuffle(self.bag.tiles)
+                                self.player_rack.refill_rack()
+
                         else:
                             clicked_tile = self.board.get_tile_at_position(event.pos)
                             if clicked_tile:

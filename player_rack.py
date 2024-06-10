@@ -14,6 +14,8 @@ class PlayerRack:
             new_tile = self.bag.take_tile()
             if new_tile:
                 self.rack.append(new_tile)
+            else:
+                break #wychodzi z petli jak bag jest pusty
 
     def get_tile_at_position(self, position):
         x, y = position

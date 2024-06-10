@@ -8,12 +8,12 @@ class Bag:
     def create_tiles(self):
        # amount of each letter
         tile_bag = {
-            'A': 9, 'Ą': 1, 'B': 2, 'C': 3, 'Ć': 1, 'D': 3, 'E': 7, 'Ę': 1,
-            'F': 1, 'G': 2, 'H': 2, 'I': 8, 'J': 2, 'K': 3, 'L': 3, 'Ł': 2,
-            'M': 3, 'N': 5, 'Ń': 1, 'O': 6, 'Ó': 1, 'P': 3, 'R': 4, 'S': 4,
-            'Ś': 1, 'T': 3, 'U': 2, 'W': 4, 'Y': 4, 'Z': 5, 'Ź': 1, 'Ż': 1,
-            '_': 2  # '_' pusty kafelek
-        }
+           'A': 9, 'Ą': 1, 'B': 2, 'C': 3, 'Ć': 1, 'D': 3, 'E': 7, 'Ę': 1,
+           'F': 1, 'G': 2, 'H': 2, 'I': 8, 'J': 2, 'K': 3, 'L': 3, 'Ł': 2,
+           'M': 3, 'N': 5, 'Ń': 1, 'O': 6, 'Ó': 1, 'P': 3, 'R': 4, 'S': 4,
+           'Ś': 1, 'T': 3, 'U': 2, 'W': 4, 'Y': 4, 'Z': 5, 'Ź': 1, 'Ż': 1,
+           '_': 2  # '_' is the blank tile
+       }
 
         tile_values = {
             'A': 1, 'Ą': 5, 'B': 3, 'C': 2, 'Ć': 6, 'D': 2, 'E': 1, 'Ę': 5,
@@ -23,7 +23,7 @@ class Bag:
             '_': 0
         }
 
-        tiles = [Tile(letter, tile_values[letter]) for letter in tile_bag] # tworzy liste obiektow Tile
+        tiles = [Tile(letter, tile_values[letter]) for letter, count in tile_bag.items() for _ in range(count)] # tworzy liste obiektow Tile
         random.shuffle(tiles) #miesza te literki
         return tiles  # zwraca tu liste pomieszanych literek
 

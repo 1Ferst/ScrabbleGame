@@ -2,6 +2,7 @@ import pygame
 from board import Board
 from bag import Bag
 from player_rack import PlayerRack
+import random
 
 LETTER_VALUES = {
     'A': 1, 'Ą': 5, 'B': 3, 'C': 2, 'Ć': 6, 'D': 2, 'E': 1, 'Ę': 5,
@@ -40,11 +41,16 @@ class Game:
         pygame.display.flip()
 
     def check_button_click(self, pos):
-        button_rect = pygame.Rect(650, 670, 120, 40)
+        button_rect = pygame.Rect(650, 660, 120, 40)
         return button_rect.collidepoint(pos)
 
     def check_remove_button_click(self, pos):
-        remove_button_rect = pygame.Rect(650, 720, 120, 40)
+        remove_button_rect = pygame.Rect(650, 750, 120, 40)
+        return remove_button_rect.collidepoint(pos)
+
+
+    def check_exchange_button_click(self, pos):
+        remove_button_rect = pygame.Rect(650, 705, 120, 40)
         return remove_button_rect.collidepoint(pos)
 
     def end_turn(self):
@@ -75,6 +81,19 @@ class Game:
                                 self.player_rack.rack.append(tile)
                                 self.current_turn_tiles.remove(tile)
                                 self.board.remove_tile(tile)
+                        elif self.check_exchange_button_click(event.pos):
+                            if self.bag.tiles:  # zobaczenie czy bag nie jest pusty
+                                for tile in self.player_rack.rack[:]:
+                                    self.bag.tiles.append(tile)
+                                    self.player_rack.remove_tile(tile)
+
+                                for tile in self.current_turn_tiles[:]: # w trakcie wymiany, wrzucenie z planszy do worka liter z tury
+                                    self.bag.tiles.append(tile)
+                                    self.current_turn_tiles.remove(tile)
+                                    self.board.remove_tile(tile)
+                                random.shuffle(self.bag.tiles)
+                                self.player_rack.refill_rack()
+
                         else:
                             clicked_tile = self.board.get_tile_at_position(event.pos)
                             if clicked_tile:

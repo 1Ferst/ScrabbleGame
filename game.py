@@ -40,11 +40,16 @@ class Game:
         pygame.display.flip()
 
     def check_button_click(self, pos):
-        button_rect = pygame.Rect(650, 670, 120, 40)
+        button_rect = pygame.Rect(650, 660, 120, 40)
         return button_rect.collidepoint(pos)
 
     def check_remove_button_click(self, pos):
-        remove_button_rect = pygame.Rect(650, 720, 120, 40)
+        remove_button_rect = pygame.Rect(650, 750, 120, 40)
+        return remove_button_rect.collidepoint(pos)
+
+
+    def check_exchange_button_click(self, pos):
+        remove_button_rect = pygame.Rect(650, 705, 120, 40)
         return remove_button_rect.collidepoint(pos)
 
     def end_turn(self):

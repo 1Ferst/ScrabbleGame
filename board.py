@@ -75,7 +75,7 @@ class Board:
         screen.blit(total_score, (x_start + 20, 560))
 
     def draw_confirm_button(self, screen):
-        button_rect = pygame.Rect(650, 670, 120, 40)  # Przesunięcie w górę przycisku "Zatwierdź"
+        button_rect = pygame.Rect(650, 660, 120, 40)  # Przesunięcie w górę przycisku "Zatwierdź"
         pygame.draw.rect(screen, (0, 128, 0), button_rect)  # Zielony kolor przycisku
         pygame.draw.rect(screen, (0, 0, 0), button_rect, 2)  # Czarny obrys przycisku
         text_surface = self.button_font.render("Zatwierdź", True, (255, 255, 255))  # Biały tekst
@@ -83,12 +83,20 @@ class Board:
         screen.blit(text_surface, text_rect)
 
         # Dodanie przycisku "Usuń"
-        remove_button_rect = pygame.Rect(650, 720, 120, 40)
+        remove_button_rect = pygame.Rect(650, 750, 120, 40)
         pygame.draw.rect(screen, (255, 0, 0), remove_button_rect)  #
         pygame.draw.rect(screen, (0, 0, 0), remove_button_rect, 2)
         remove_text_surface = self.button_font.render("Usuń", True, (255, 255, 255))  # Biały tekst
         remove_text_rect = remove_text_surface.get_rect(center=remove_button_rect.center)
         screen.blit(remove_text_surface, remove_text_rect)
+
+        exchange_button_rect = pygame.Rect(650, 705, 120, 40)
+        pygame.draw.rect(screen, (255, 215, 0), exchange_button_rect)
+        pygame.draw.rect(screen, (0, 0, 0), exchange_button_rect, 2)
+        exchange_text_surface = self.button_font.render("Wymień", True, (255, 255, 255))  # Biały tekst
+        exchange_text_rect = exchange_text_surface.get_rect(center=exchange_button_rect.center)
+        screen.blit(exchange_text_surface, exchange_text_rect)
+
 
     def get_tile_at_position(self, position):
         x, y = position

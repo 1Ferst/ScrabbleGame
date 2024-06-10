@@ -86,6 +86,11 @@ class Game:
                                 for tile in self.player_rack.rack[:]:
                                     self.bag.tiles.append(tile)
                                     self.player_rack.remove_tile(tile)
+
+                                for tile in self.current_turn_tiles[:]: # w trakcie wymiany, wrzucenie z planszy do worka liter z tury
+                                    self.bag.tiles.append(tile)
+                                    self.current_turn_tiles.remove(tile)
+                                    self.board.remove_tile(tile)
                                 random.shuffle(self.bag.tiles)
                                 self.player_rack.refill_rack()
 

@@ -43,7 +43,7 @@ class Tile:
                 value_rect = value_surface.get_rect(bottomright=(self.tile_width - 2, self.tile_height - 2))
                 # Narysowanie tekstu na powierzchni
                 surface.blit(value_surface, value_rect)
-        if self.modifier:
+        elif self.modifier:
             # Utworzenie tekstu na powierzchni dla modyfikatora
             modifier_surface = self.modifier_font.render(str(self.modifier), True, self.text_color)
             # Ustawienie pozycji tekstu na środku powierzchni

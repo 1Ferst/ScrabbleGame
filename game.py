@@ -26,6 +26,7 @@ class Game:
         self.dragging_offset_x = 0
         self.dragging_offset_y = 0
 
+        self.words_on_board = set()
         self.current_turn_tiles = []
 
     def draw_game(self):
@@ -63,6 +64,14 @@ class Game:
             self.player_rack.rack.append(tile)
             self.current_turn_tiles.remove(tile)
             self.board.remove_tile(tile)
+
+    def get_neighbors_horizontally(self, row, col):
+        neighbors = set()
+        if row > 0:
+            neighbors.add(self.board.grid[row - 1][col])
+        if row < 14:
+            neighbors.add(self.board.grid[row + 1][col])
+        return neighbors
 
     def run(self):
         running = True

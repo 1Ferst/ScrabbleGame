@@ -43,7 +43,7 @@ class Instructions:
         self.screen = screen
         self.font = pygame.font.Font(None, 25)
         self.font_title = pygame.font.Font(None, 50)
-        self.background_color = (176, 224, 230)
+        self.background_color = (255, 228, 225)
 
     def draw_instructions(self):
         self.screen.fill(self.background_color)

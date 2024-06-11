@@ -73,6 +73,14 @@ class Game:
             neighbors.add(self.board.grid[row + 1][col])
         return neighbors
 
+    def get_neighbors_vertically(self, row, col):
+        neighbors = set()
+        if col > 0:
+            neighbors.add(self.board.grid[row][col - 1])
+        if col < 14:
+            neighbors.add(self.board.grid[row][col + 1])
+        return neighbors
+
     def run(self):
         running = True
         while running:

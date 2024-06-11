@@ -182,6 +182,40 @@ class Game:
         all_words_valid = all(word_checker.is_word_valid(word) for word, _, _ in words_and_positions)
         return all_words_valid, words_and_positions
 
+    def calculate_word_score(self, word, start_pos, direction):
+        print(f"\n===calculate_word_score  word: {word}, start_pos: {start_pos}, direction: {direction} ")
+        score = 0
+        word_multiplier = 1
+        x, y = start_pos
+
+        for letter in word:
+            tile = self.board.grid[y][x]
+            print(f"letter: {letter}")
+            print(f"row:{y} col: {x} modifier: {tile.modifier}")
+            letter_score = tile.value
+            type(letter_score)
+            if tile.modifier == 'L2':
+                letter_score *= 2
+            elif tile.modifier == 'L3':
+                letter_score *= 3
+            elif tile.modifier == 'S2':
+                word_multiplier *= 2
+            elif tile.modifier == 'S3':
+                word_multiplier *= 3
+            elif tile.modifier == 'S4':
+                word_multiplier *= 4
+
+            score += letter_score
+
+            if direction == 'horizontal':
+                x += 1
+            elif direction == 'vertical':
+                y += 1
+        print(f'score: {score} word_multiplier: {word_multiplier}')
+        return score * word_multiplier
+
+
+
     def run(self):
         running = True
         while running:

@@ -14,10 +14,8 @@ LETTER_VALUES = {
 
 
 class Game:
-    def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode((800, 800))
-        pygame.display.set_caption("Scrabble")
+    def __init__(self, screen):
+        self.screen = screen
         self.board = Board()
         self.bag = Bag()
         self.player_rack = PlayerRack(self.bag)

@@ -56,6 +56,28 @@ class Game:
     def end_turn(self):
         # Logika zatwierdzania ruchu
         print("Zatwierdzono ruch")
+        all_words_valid, words_and_positions = self.check_words()
+        if any([word for word, _, _ in words_and_positions if word in self.words_on_board]):
+            print('Słowo się powtarza')
+        print(f"{len(words_and_positions) = }")
+        if all_words_valid:
+            total_turn_score = 0
+            for word, start_pos, direction in words_and_positions:
+                # EDIT wyswietlanie info dla uzytkownika o zdobytych punktach
+                total_turn_score += self.calculate_word_score(word, start_pos, direction)
+                self.words_on_board.add(word)
+
+            self.player_score += total_turn_score
+            for x, y, tile in self.current_turn_tiles:
+                tile.modifier = None
+        else:
+            # Return tiles to the rack if words are invalid
+            for x, y, tile in self.current_turn_tiles[:]:
+                self.player_rack.rack.append(tile)
+                self.current_turn_tiles.remove((x, y, tile))
+                self.board.remove_tile(tile)
+            print("Invalid move. Tiles returned to rack.")
+
         self.player_rack.refill_rack()
         self.dragging_tile = None
         self.current_turn_tiles = []

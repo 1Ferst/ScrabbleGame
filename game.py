@@ -71,6 +71,7 @@ class Game:
             neighbors.add(self.board.grid[row - 1][col])
         if row < 14:
             neighbors.add(self.board.grid[row + 1][col])
+
         return neighbors
 
     def get_neighbors_vertically(self, row, col):
@@ -79,7 +80,52 @@ class Game:
             neighbors.add(self.board.grid[row][col - 1])
         if col < 14:
             neighbors.add(self.board.grid[row][col + 1])
+
         return neighbors
+
+    def is_constant_straight_line_with_neighbor(self, tiles):
+        if not tiles:
+            return False
+
+        rows = [tile[1] for tile in tiles]  # y
+        cols = [tile[0] for tile in tiles]  # x
+
+        # EDIT potrzebne wyswietlanie info dla uzytkownika
+        if self.words_on_board and (7, 7) not in [(tile[0], tile[1]) for tile in tiles]:
+            print('Pierwsze słowo musi być na środku')
+            return False
+        # Sprawdzenie czy wszystkie kafelki są w jednej linii
+        is_straight = len(set(rows)) == 1 or len(set(cols)) == 1
+        if not is_straight:
+            return False
+
+        # Sprawdzenie ciągłości
+        if len(set(rows)) == 1:  # Wszystkie kafelki w jednym wierszu
+            row = rows[0]
+            min_col, max_col = min(cols), max(cols)
+            for col in range(min_col, max_col + 1):
+                if self.board.grid[row][col].letter is None:
+                    return False
+                # Sprawdzenie sąsiadów
+                if self.words_on_board:
+                    neighbors = self.get_neighbors_vertically(row, col)
+                    if not any(neighbor.letter is not None for neighbor in neighbors):
+                        return False
+
+        else:  # Wszystkie kafelki w jednej kolumnie
+            col = cols[0]
+            min_row, max_row = min(rows), max(rows)
+            for row in range(min_row, max_row + 1):
+                if self.board.grid[row][col].letter is None:
+                    return False
+
+                # Sprawdzenie sąsiadów
+                if self.words_on_board:
+                    neighbors = self.get_neighbors_horizontally(row, col)
+                    if not any(neighbor.letter is not None for neighbor in neighbors):
+                        return False
+
+        return True
 
     def run(self):
         running = True

@@ -57,6 +57,7 @@ class Game:
         # Logika zatwierdzania ruchu
         print("Zatwierdzono ruch")
         all_words_valid, words_and_positions = self.check_words()
+        # EDIT
         if any([word for word, _, _ in words_and_positions if word in self.words_on_board]):
             print('Słowo się powtarza')
         print(f"{len(words_and_positions) = }")
@@ -114,7 +115,7 @@ class Game:
         cols = [tile[0] for tile in tiles]  # x
 
         # EDIT potrzebne wyswietlanie info dla uzytkownika
-        if self.words_on_board and (7, 7) not in [(tile[0], tile[1]) for tile in tiles]:
+        if not self.words_on_board and (7, 7) not in [(tile[0], tile[1]) for tile in tiles]:
             print('Pierwsze słowo musi być na środku')
             return False
         # Sprawdzenie czy wszystkie kafelki są w jednej linii
@@ -236,8 +237,6 @@ class Game:
         print(f'score: {score} word_multiplier: {word_multiplier}')
         return score * word_multiplier
 
-
-
     def run(self):
         running = True
         while running:
@@ -249,9 +248,9 @@ class Game:
                         if self.check_button_click(event.pos):
                             self.end_turn()
                         elif self.check_remove_button_click(event.pos):
-                            for tile in self.current_turn_tiles[:]:
+                            for x, y, tile in self.current_turn_tiles[:]:
                                 self.player_rack.rack.append(tile)
-                                self.current_turn_tiles.remove(tile)
+                                self.current_turn_tiles.remove((x, y, tile))
                                 self.board.remove_tile(tile)
                         elif self.check_exchange_button_click(event.pos):
                             if self.bag.tiles:  # zobaczenie czy bag nie jest pusty
@@ -259,9 +258,9 @@ class Game:
                                     self.bag.tiles.append(tile)
                                     self.player_rack.remove_tile(tile)
 
-                                for tile in self.current_turn_tiles[:]: # w trakcie wymiany, wrzucenie z planszy do worka liter z tury
+                                for x, y, tile in self.current_turn_tiles[:]: # w trakcie wymiany, wrzucenie z planszy do worka liter z tury
                                     self.bag.tiles.append(tile)
-                                    self.current_turn_tiles.remove(tile)
+                                    self.current_turn_tiles.remove((x, y, tile))
                                     self.board.remove_tile(tile)
                                 random.shuffle(self.bag.tiles)
                                 self.player_rack.refill_rack()
@@ -283,14 +282,13 @@ class Game:
                         grid_y = event.pos[1] // 40
                         if 0 <= grid_x < 15 and 0 <= grid_y < 15:
                             if self.board.grid[grid_y][grid_x].letter is None:  # Sprawdzenie, czy pole jest puste
+                                self.dragging_tile.modifier = self.board.grid[grid_y][grid_x].modifier
                                 self.board.place_tile(grid_x, grid_y, self.dragging_tile)
-                                self.current_turn_tiles.append(self.dragging_tile)
+                                self.current_turn_tiles.append((grid_x, grid_y, self.dragging_tile))
                             else:
                                 self.player_rack.rack.append(self.dragging_tile)  # Wrzucenie kafelka z powrotem na stojak
                         else:
                             self.player_rack.rack.append(self.dragging_tile)
-                            # zmienic na insert zeby przywrocic kafelek na poprzednia pozycja jesli upuscimy poza plansze
-                            # lub wcale nie zmieniac pozycji reszty kafelkow do zakonczenia tury
                         self.dragging_tile = None
                 elif event.type == pygame.MOUSEMOTION:
                     if self.dragging_tile:

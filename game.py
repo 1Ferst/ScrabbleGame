@@ -127,6 +127,28 @@ class Game:
 
         return True
 
+    def get_word_at(self, x, y, direction):
+        word = ""
+        x_start_pos = x
+        y_start_pos = y
+        if direction == "horizontal":
+            while x > 0 and self.board.grid[y][x - 1].letter:
+                x -= 1
+            x_start_pos = x
+            while x < 15 and self.board.grid[y][x].letter:
+                word += self.board.grid[y][x].letter
+                x += 1
+        elif direction == "vertical":
+            while y > 0 and self.board.grid[y - 1][x].letter:
+                y -= 1
+            y_start_pos = y
+            while y < 15 and self.board.grid[y][x].letter:
+                word += self.board.grid[y][x].letter
+                y += 1
+        return x_start_pos, y_start_pos, word
+
+
+
     def run(self):
         running = True
         while running:

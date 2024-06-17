@@ -23,15 +23,16 @@ class Game:
         self.selected_tile = None
         self.messages = []
         self.message_duration = 5
+        self.point_actions = []
 
-    def set_message(self, message):
+    def set_message(self, message, green=False):
         timestamp = time.time()
-        self.messages.append((message, timestamp))
+        self.messages.append((message, timestamp, green))
 
     def draw_game(self):
         self.screen.fill((255, 255, 255))
         self.board.draw(self.screen)
-        self.board.draw_player_score(self.screen, self.player_score)
+        self.board.draw_player_score(self.screen, self.player_score, self.point_actions)
         self.player_rack.draw(self.screen)
         self.board.draw_confirm_button(self.screen)
         self.draw_messages()
@@ -41,13 +42,14 @@ class Game:
 
     def draw_messages(self):
         y_offset = 10
-        for message, timestamp in self.messages:
+        for message, timestamp, green in self.messages:
             elapsed_time = time.time() - timestamp
             if elapsed_time < self.message_duration:
                 font = pygame.font.Font(None, 36)
                 text = font.render(message, True, (255, 255, 255))
                 text_rect = text.get_rect(center=(300, 20 + y_offset))
-                pygame.draw.rect(self.screen, (255, 0, 0), (text_rect.left - 10, text_rect.top - 10, text_rect.width + 20, text_rect.height + 20))
+                surface_color = (0, 255, 0) if green else (255, 0, 0)
+                pygame.draw.rect(self.screen, surface_color, (text_rect.left - 10, text_rect.top - 10, text_rect.width + 20, text_rect.height + 20))
                 self.screen.blit(text, text_rect)
                 y_offset += text_rect.height + 20
             else:
@@ -73,9 +75,13 @@ class Game:
             total_turn_score = 0
             for word, start_pos, direction in words_and_positions:
                 word_score = self.calculate_word_score(word, start_pos, direction)
+                print(f'{word = } {word_score = } {start_pos = } {direction = }')
                 total_turn_score += word_score
                 self.words_on_board.add(word)
-                self.set_message(f'Za słowo {word} otrzymujesz {word_score} punktów')
+                self.set_message(f'Za słowo {word} otrzymujesz +{word_score}', green=True)
+                self.point_actions.insert(0, (word, word_score))
+                if len(self.point_actions) > 15:
+                    self.point_actions.pop()
 
             self.player_score += total_turn_score
             for x, y, tile in self.current_turn_tiles:
@@ -100,6 +106,12 @@ class Game:
             self.current_turn_tiles.remove(tile_tuple)
             self.board.remove_tile(tile)
 
+    def get_neighbors(self, row, col):
+        neighbors = set()
+        neighbors.update(self.get_neighbors_vertically(row, col))
+        neighbors.update(self.get_neighbors_horizontally(row, col))
+        return neighbors
+
     def get_neighbors_horizontally(self, row, col):
         neighbors = set()
         if row > 0:
@@ -119,7 +131,8 @@ class Game:
         return neighbors
 
     def is_constant_straight_line_with_neighbor(self, tiles):
-        if len([tile[0] for tile in tiles]) < 2 and not self.words_on_board:
+        num_of_tiles = len([tile[0] for tile in tiles])
+        if num_of_tiles < 2 and not self.words_on_board:
             self.set_message('Przynajmniej dwuliterowe słowa')
             return False
 
@@ -135,31 +148,38 @@ class Game:
             self.set_message('Kafelki nie są ułożone w linii prostej')
             return False
 
-        if len(set(rows)) == 1:
-            row = rows[0]
-            min_col, max_col = min(cols), max(cols)
-            for col in range(min_col, max_col + 1):
-                if self.board.grid[row][col].letter is None:
-                    self.set_message('W słowie jest luka')
-                    return False
-                if self.words_on_board:
-                    neighbors = self.get_neighbors_vertically(row, col)
-                    if not any(neighbor.letter is not None for neighbor in neighbors):
-                        self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
-                        return False
+        if num_of_tiles == 1:
+            if not self.get_neighbors(rows[0], cols[0]):
+                self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
+                return False
 
         else:
-            col = cols[0]
-            min_row, max_row = min(rows), max(rows)
-            for row in range(min_row, max_row + 1):
-                if self.board.grid[row][col].letter is None:
-                    self.set_message('W słowie jest luka')
-                    return False
-                if self.words_on_board:
-                    neighbors = self.get_neighbors_horizontally(row, col)
-                    if not any(neighbor.letter is not None for neighbor in neighbors):
-                        self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
+            if len(set(rows)) == 1:
+                row = rows[0]
+                min_col, max_col = min(cols), max(cols)
+                for col in range(min_col, max_col + 1):
+                    if self.board.grid[row][col].letter is None:
+                        self.set_message('W słowie jest luka')
                         return False
+                    if self.words_on_board:
+                        neighbors = self.get_neighbors_vertically(row, col)
+                        if not any(neighbor.letter is not None for neighbor in neighbors):
+                            self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
+                            return False
+
+            else:
+                col = cols[0]
+                min_row, max_row = min(rows), max(rows)
+                for row in range(min_row, max_row + 1):
+                    if self.board.grid[row][col].letter is None:
+                        self.set_message('W słowie jest luka')
+                        return False
+                    if self.words_on_board:
+                        neighbors = self.get_neighbors_horizontally(row, col)
+                        print(neighbor.letter for neighbor in neighbors)
+                        if not any(neighbor.letter is not None for neighbor in neighbors):
+                            self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
+                            return False
 
         return True
 
@@ -213,7 +233,12 @@ class Game:
             if not word_checker.is_word_valid(word):
                 all_words_valid = False
                 self.set_message(f'Słowo {word} nie znajduje się w słowniku')
-
+        if not all_words_valid:
+            self.set_message('Błędne słowo -5 pkt')
+            self.point_actions.insert(0, ('Błędne słowo', -5))
+            self.player_score -= 5
+            if len(self.point_actions) > 15:
+                self.point_actions.pop()
         return all_words_valid, words_and_positions
 
     def calculate_word_score(self, word, start_pos, direction):
@@ -271,6 +296,10 @@ class Game:
                                     self.board.remove_tile(tile)
                                 random.shuffle(self.bag.tiles)
                                 self.player_rack.refill_rack()
+                                self.player_score -= 20
+                                self.point_actions.insert(0, ('Wymiana', -20))
+                                if len(self.point_actions) > 15:
+                                    self.point_actions.pop()
 
                         else:
                             clicked_tile = self.board.get_tile_at_position(event.pos)

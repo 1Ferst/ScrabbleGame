@@ -3,9 +3,10 @@ from game import Game
 from menu import Menu
 from menu import Instructions
 
+
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((800, 800))
+    screen = pygame.display.set_mode((850, 800))
     pygame.display.set_caption("Scrabble")
 
     menu = Menu(screen)

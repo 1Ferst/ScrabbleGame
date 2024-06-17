@@ -60,15 +60,21 @@ class Board:
     def place_tile(self, x, y, tile):
         self.grid[y][x] = tile
 
-    def draw_player_score(self, screen, player_score):
+    def draw_player_score(self, screen, player_score, word_scores):
         x_start = 610  # Prawa strona planszy, szerokość tablicy to 600, więc zaczynamy od 610
 
         # Rysowanie prostokąta dla wyników
-        pygame.draw.rect(screen, (205, 133, 63), [x_start, 0, 180, 600])
+        pygame.draw.rect(screen, (205, 133, 63), [x_start, 0, 250, 600])
 
         # Rysowanie tytułu "Your Points"
         score_title = self.score_font.render("Your Points", True, (0, 0, 0))
         screen.blit(score_title, (x_start + 20, 20)) # jedna powierzchnia jest kopiowana na druga
+
+        y_offset = 60  # Początkowy offset dla punktów za słowa
+        for word, score in word_scores:
+            word_score_text = self.score_font.render(f"{score} : {word} ", True, (0, 0, 0))
+            screen.blit(word_score_text, (x_start + 20, y_offset))
+            y_offset += 30  # Odstęp pomiędzy kolejnymi wpisami
 
         # Miejsce na wyniki gracza (później można tu dodawać wyniki)
         # Rysowanie całkowitego wyniku na dole prostokąta

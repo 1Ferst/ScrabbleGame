@@ -28,6 +28,7 @@ SPECIAL_TILES = {
             (14, 0): 'S4', (14, 3): 'L2', (14, 7): 'S3', (14, 11): 'L2', (14, 14): 'S4'
         }
 
+
 class Board:
     def __init__(self):
         self.grid = self.create_board()
@@ -35,7 +36,6 @@ class Board:
         self.button_font = pygame.font.Font(None, 32)
 
     def create_board(self):
-
         grid = []
         for y in range(15):
             row = []
@@ -56,6 +56,7 @@ class Board:
                 rect = pygame.Rect(x * 40, y * 40, 40, 40)
                 self.grid[y][x].rect.topleft = rect.topleft
                 self.grid[y][x].draw(screen, rect.topleft)
+
     def place_tile(self, x, y, tile):
         self.grid[y][x] = tile
 
@@ -96,7 +97,6 @@ class Board:
         exchange_text_surface = self.button_font.render("Wymień", True, (255, 255, 255))  # Biały tekst
         exchange_text_rect = exchange_text_surface.get_rect(center=exchange_button_rect.center)
         screen.blit(exchange_text_surface, exchange_text_rect)
-
 
     def get_tile_at_position(self, position):
         x, y = position

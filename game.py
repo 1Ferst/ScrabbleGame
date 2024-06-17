@@ -4,14 +4,7 @@ from bag import Bag
 from player_rack import PlayerRack
 import random
 import word_checker
-
-LETTER_VALUES = {
-    'A': 1, 'Ą': 5, 'B': 3, 'C': 2, 'Ć': 6, 'D': 2, 'E': 1, 'Ę': 5,
-    'F': 5, 'G': 3, 'H': 3, 'I': 1, 'J': 3, 'K': 2, 'L': 2, 'Ł': 3,
-    'M': 2, 'N': 1, 'Ń': 7, 'O': 1, 'Ó': 5, 'P': 2, 'R': 1, 'S': 1,
-    'Ś': 5, 'T': 2, 'U': 3, 'W': 1, 'Y': 2, 'Z': 1, 'Ź': 9, 'Ż': 5,
-    '_': 0
-}
+import time
 
 
 class Game:
@@ -20,15 +13,20 @@ class Game:
         self.board = Board()
         self.bag = Bag()
         self.player_rack = PlayerRack(self.bag)
-        self.letter_values = LETTER_VALUES
         self.player_score = 0
         self.player_rack.refill_rack()
         self.dragging_tile = None
         self.dragging_offset_x = 0
         self.dragging_offset_y = 0
-
         self.words_on_board = set()
         self.current_turn_tiles = []
+        self.selected_tile = None
+        self.messages = []
+        self.message_duration = 5
+
+    def set_message(self, message):
+        timestamp = time.time()
+        self.messages.append((message, timestamp))
 
     def draw_game(self):
         self.screen.fill((255, 255, 255))
@@ -36,9 +34,24 @@ class Game:
         self.board.draw_player_score(self.screen, self.player_score)
         self.player_rack.draw(self.screen)
         self.board.draw_confirm_button(self.screen)
+        self.draw_messages()
         if self.dragging_tile:
             self.dragging_tile.draw(self.screen, (pygame.mouse.get_pos()[0] - self.dragging_offset_x, pygame.mouse.get_pos()[1] - self.dragging_offset_y))
         pygame.display.flip()
+
+    def draw_messages(self):
+        y_offset = 10
+        for message, timestamp in self.messages:
+            elapsed_time = time.time() - timestamp
+            if elapsed_time < self.message_duration:
+                font = pygame.font.Font(None, 36)
+                text = font.render(message, True, (255, 255, 255))
+                text_rect = text.get_rect(center=(300, 20 + y_offset))
+                pygame.draw.rect(self.screen, (255, 0, 0), (text_rect.left - 10, text_rect.top - 10, text_rect.width + 20, text_rect.height + 20))
+                self.screen.blit(text, text_rect)
+                y_offset += text_rect.height + 20
+            else:
+                self.messages.pop(0)
 
     def check_button_click(self, pos):
         button_rect = pygame.Rect(650, 660, 120, 40)
@@ -48,45 +61,43 @@ class Game:
         remove_button_rect = pygame.Rect(650, 750, 120, 40)
         return remove_button_rect.collidepoint(pos)
 
-
     def check_exchange_button_click(self, pos):
         remove_button_rect = pygame.Rect(650, 705, 120, 40)
         return remove_button_rect.collidepoint(pos)
 
     def end_turn(self):
-        # Logika zatwierdzania ruchu
-        print("Zatwierdzono ruch")
         all_words_valid, words_and_positions = self.check_words()
-        # EDIT
         if any([word for word, _, _ in words_and_positions if word in self.words_on_board]):
-            print('Słowo się powtarza')
-        print(f"{len(words_and_positions) = }")
+            self.set_message('Słowo się powtarza')
         if all_words_valid:
             total_turn_score = 0
             for word, start_pos, direction in words_and_positions:
-                # EDIT wyswietlanie info dla uzytkownika o zdobytych punktach
-                total_turn_score += self.calculate_word_score(word, start_pos, direction)
+                word_score = self.calculate_word_score(word, start_pos, direction)
+                total_turn_score += word_score
                 self.words_on_board.add(word)
+                self.set_message(f'Za słowo {word} otrzymujesz {word_score} punktów')
 
             self.player_score += total_turn_score
             for x, y, tile in self.current_turn_tiles:
                 tile.modifier = None
         else:
-            # Return tiles to the rack if words are invalid
             for x, y, tile in self.current_turn_tiles[:]:
                 self.player_rack.rack.append(tile)
                 self.current_turn_tiles.remove((x, y, tile))
                 self.board.remove_tile(tile)
-            print("Invalid move. Tiles returned to rack.")
+            if self.current_turn_tiles:
+                self.set_message('Kafelki wróciły na stojak')
 
         self.player_rack.refill_rack()
         self.dragging_tile = None
         self.current_turn_tiles = []
 
     def return_tile_to_rack(self, tile):
-        if tile in self.current_turn_tiles:
+        tile_tuple = next((t for t in self.current_turn_tiles if t[2] == tile), None)
+
+        if tile_tuple:
             self.player_rack.rack.append(tile)
-            self.current_turn_tiles.remove(tile)
+            self.current_turn_tiles.remove(tile_tuple)
             self.board.remove_tile(tile)
 
     def get_neighbors_horizontally(self, row, col):
@@ -108,61 +119,62 @@ class Game:
         return neighbors
 
     def is_constant_straight_line_with_neighbor(self, tiles):
-        if not tiles:
+        if len([tile[0] for tile in tiles]) < 2 and not self.words_on_board:
+            self.set_message('Przynajmniej dwuliterowe słowa')
             return False
 
-        rows = [tile[1] for tile in tiles]  # y
-        cols = [tile[0] for tile in tiles]  # x
+        rows = [tile[1] for tile in tiles]
+        cols = [tile[0] for tile in tiles]
 
-        # EDIT potrzebne wyswietlanie info dla uzytkownika
         if not self.words_on_board and (7, 7) not in [(tile[0], tile[1]) for tile in tiles]:
-            print('Pierwsze słowo musi być na środku')
+            self.set_message('Pierwsze słowo musi być ulokowane na środku')
             return False
-        # Sprawdzenie czy wszystkie kafelki są w jednej linii
+
         is_straight = len(set(rows)) == 1 or len(set(cols)) == 1
         if not is_straight:
+            self.set_message('Kafelki nie są ułożone w linii prostej')
             return False
 
-        # Sprawdzenie ciągłości
-        if len(set(rows)) == 1:  # Wszystkie kafelki w jednym wierszu
+        if len(set(rows)) == 1:
             row = rows[0]
             min_col, max_col = min(cols), max(cols)
             for col in range(min_col, max_col + 1):
                 if self.board.grid[row][col].letter is None:
+                    self.set_message('W słowie jest luka')
                     return False
-                # Sprawdzenie sąsiadów
                 if self.words_on_board:
                     neighbors = self.get_neighbors_vertically(row, col)
                     if not any(neighbor.letter is not None for neighbor in neighbors):
+                        self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
                         return False
 
-        else:  # Wszystkie kafelki w jednej kolumnie
+        else:
             col = cols[0]
             min_row, max_row = min(rows), max(rows)
             for row in range(min_row, max_row + 1):
                 if self.board.grid[row][col].letter is None:
+                    self.set_message('W słowie jest luka')
                     return False
-
-                # Sprawdzenie sąsiadów
                 if self.words_on_board:
                     neighbors = self.get_neighbors_horizontally(row, col)
                     if not any(neighbor.letter is not None for neighbor in neighbors):
+                        self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
                         return False
 
         return True
 
     def get_word_at(self, x, y, direction):
-        word = ""
+        word = ''
         x_start_pos = x
         y_start_pos = y
-        if direction == "horizontal":
+        if direction == 'horizontal':
             while x > 0 and self.board.grid[y][x - 1].letter:
                 x -= 1
             x_start_pos = x
             while x < 15 and self.board.grid[y][x].letter:
                 word += self.board.grid[y][x].letter
                 x += 1
-        elif direction == "vertical":
+        elif direction == 'vertical':
             while y > 0 and self.board.grid[y - 1][x].letter:
                 y -= 1
             y_start_pos = y
@@ -176,47 +188,42 @@ class Game:
             return False, []
 
         words_and_positions = []
-        direction = "horizontal" if len({y for x, y, tile in self.current_turn_tiles}) == 1 else "vertical"
+        direction = 'horizontal' if len({y for x, y, tile in self.current_turn_tiles}) == 1 else 'vertical'
         for x, y, tile in self.current_turn_tiles:
             x, y, main_word = self.get_word_at(x, y, direction)
             if main_word and len(main_word) > 1 and main_word not in [word for word, _, _ in words_and_positions]:
                 word_start_pos = (x, y)
                 words_and_positions.append((main_word, word_start_pos, direction))
 
-            if direction == "horizontal":
-                x, y, vertical_word = self.get_word_at(x, y, "vertical")
-                print(f"vertical_word: {vertical_word}")
+            if direction == 'horizontal':
+                x, y, vertical_word = self.get_word_at(x, y, 'vertical')
                 if vertical_word and len(vertical_word) > 1 and vertical_word not in [word for word, _, _ in
                                                                                       words_and_positions]:
                     word_start_pos = (x, y)
-                    words_and_positions.append((vertical_word, word_start_pos, "vertical"))
-            elif direction == "vertical":
-                x, y, horizontal_word = self.get_word_at(x, y, "horizontal")
-                print(f"horizontal_word: {horizontal_word}")
+                    words_and_positions.append((vertical_word, word_start_pos, 'vertical'))
+            elif direction == 'vertical':
+                x, y, horizontal_word = self.get_word_at(x, y, 'horizontal')
                 if horizontal_word and len(horizontal_word) > 1 and horizontal_word not in [word for word, _, _ in
                                                                                             words_and_positions]:
                     word_start_pos = (x, y)
-                    words_and_positions.append((horizontal_word, word_start_pos, "horizontal"))
+                    words_and_positions.append((horizontal_word, word_start_pos, 'horizontal'))
 
-        print(f"\n===check_words   is_word_valid check for words: {words_and_positions = }")
+        all_words_valid = True
+        for word, _, _ in words_and_positions:
+            if not word_checker.is_word_valid(word):
+                all_words_valid = False
+                self.set_message(f'Słowo {word} nie znajduje się w słowniku')
 
-        # only valid: words_and_positions = [(word, word_start_pos, direction) for word, word_start_pos, direction in
-        #                        words_and_positions if word_checker.is_word_valid(word)]
-        all_words_valid = all(word_checker.is_word_valid(word) for word, _, _ in words_and_positions)
         return all_words_valid, words_and_positions
 
     def calculate_word_score(self, word, start_pos, direction):
-        print(f"\n===calculate_word_score  word: {word}, start_pos: {start_pos}, direction: {direction} ")
         score = 0
         word_multiplier = 1
         x, y = start_pos
 
         for letter in word:
             tile = self.board.grid[y][x]
-            print(f"letter: {letter}")
-            print(f"row:{y} col: {x} modifier: {tile.modifier}")
             letter_score = tile.value
-            type(letter_score)
             if tile.modifier == 'L2':
                 letter_score *= 2
             elif tile.modifier == 'L3':
@@ -234,7 +241,7 @@ class Game:
                 x += 1
             elif direction == 'vertical':
                 y += 1
-        print(f'score: {score} word_multiplier: {word_multiplier}')
+
         return score * word_multiplier
 
     def run(self):
@@ -253,12 +260,12 @@ class Game:
                                 self.current_turn_tiles.remove((x, y, tile))
                                 self.board.remove_tile(tile)
                         elif self.check_exchange_button_click(event.pos):
-                            if self.bag.tiles:  # zobaczenie czy bag nie jest pusty
+                            if self.bag.tiles:  # Zobaczenie czy bag nie jest pusty
                                 for tile in self.player_rack.rack[:]:
                                     self.bag.tiles.append(tile)
                                     self.player_rack.remove_tile(tile)
 
-                                for x, y, tile in self.current_turn_tiles[:]: # w trakcie wymiany, wrzucenie z planszy do worka liter z tury
+                                for x, y, tile in self.current_turn_tiles[:]:  # W trakcie wymiany, wrzucenie z planszy do worka liter z tury
                                     self.bag.tiles.append(tile)
                                     self.current_turn_tiles.remove((x, y, tile))
                                     self.board.remove_tile(tile)
@@ -285,8 +292,11 @@ class Game:
                                 self.dragging_tile.modifier = self.board.grid[grid_y][grid_x].modifier
                                 self.board.place_tile(grid_x, grid_y, self.dragging_tile)
                                 self.current_turn_tiles.append((grid_x, grid_y, self.dragging_tile))
+                                if self.dragging_tile.letter == '_':
+                                    self.selected_tile = self.dragging_tile
                             else:
-                                self.player_rack.rack.append(self.dragging_tile)  # Wrzucenie kafelka z powrotem na stojak
+                                self.player_rack.rack.append(
+                                    self.dragging_tile)  # Wrzucenie kafelka z powrotem na stojak
                         else:
                             self.player_rack.rack.append(self.dragging_tile)
                         self.dragging_tile = None
@@ -295,10 +305,13 @@ class Game:
                         self.draw_game()
 
                 elif event.type == pygame.KEYDOWN:
+                    if self.selected_tile:
+                        if event.unicode.isalpha() and len(event.unicode) == 1:
+                            self.selected_tile.letter = event.unicode.upper()
+                            self.selected_tile = None
                     if event.key == pygame.K_RETURN:  # Naciśnięto klawisz Enter
                         self.player_rack.refill_rack()
                         self.current_turn_tiles = []
-            # uzupelniac dopiero po zakonczeniu rundy lub w przypadku wymiany liter
             self.draw_game()
 
         pygame.quit()

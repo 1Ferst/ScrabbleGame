@@ -308,6 +308,7 @@ class Game:
                                 random.shuffle(self.bag.tiles)
                                 self.player_rack.refill_rack()
                                 self.player_score -= 20
+                                self.set_message('Wymiana -20')
                                 self.point_actions.insert(0, ('Wymiana', -20))
                                 if len(self.point_actions) > 15:
                                     self.point_actions.pop()

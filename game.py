@@ -355,8 +355,7 @@ class Game:
                             self.selected_tile.letter = event.unicode.upper()
                             self.selected_tile = None
                     if event.key == pygame.K_RETURN:  # Naciśnięto klawisz Enter
-                        self.player_rack.refill_rack()
-                        self.current_turn_tiles = []
+                        self.end_turn()
             self.draw_game()
 
             if self.game_over:

@@ -15,7 +15,7 @@ def main():
     in_menu = True
     show_instructions = False
 
-    while True:  # Główna pętla
+    while True:
         while in_menu or show_instructions:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

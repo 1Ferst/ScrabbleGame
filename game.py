@@ -24,6 +24,7 @@ class Game:
         self.messages = []
         self.message_duration = 5
         self.point_actions = []
+        self.game_over = False
 
     def set_message(self, message, green=False):
         timestamp = time.time()
@@ -56,16 +57,20 @@ class Game:
                 self.messages.pop(0)
 
     def check_button_click(self, pos):
-        button_rect = pygame.Rect(650, 660, 120, 40)
+        button_rect = pygame.Rect(670, 615, 140, 40)
         return button_rect.collidepoint(pos)
 
     def check_remove_button_click(self, pos):
-        remove_button_rect = pygame.Rect(650, 750, 120, 40)
+        remove_button_rect = pygame.Rect(670, 705, 140, 40)
         return remove_button_rect.collidepoint(pos)
 
     def check_exchange_button_click(self, pos):
-        remove_button_rect = pygame.Rect(650, 705, 120, 40)
-        return remove_button_rect.collidepoint(pos)
+        exchange_button_rect = pygame.Rect(670, 660, 140, 40)
+        return exchange_button_rect.collidepoint(pos)
+
+    def check_end_game_button_click(self, pos):
+        end_game_button_rect = pygame.Rect(670, 750, 140, 40)
+        return end_game_button_rect.collidepoint(pos)
 
     def end_turn(self):
         all_words_valid, words_and_positions = self.check_words()
@@ -304,6 +309,9 @@ class Game:
                                 if len(self.point_actions) > 15:
                                     self.point_actions.pop()
 
+                        elif self.check_end_game_button_click(event.pos):
+                            self.game_over = True
+
                         else:
                             clicked_tile = self.board.get_tile_at_position(event.pos)
                             if clicked_tile:
@@ -348,4 +356,9 @@ class Game:
                         self.current_turn_tiles = []
             self.draw_game()
 
-        pygame.quit()
+            if self.game_over:
+                return self.player_score
+
+        return self.player_score
+
+

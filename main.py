@@ -7,7 +7,7 @@ from menu import Instructions
 def main():
     pygame.init()
     screen = pygame.display.set_mode((850, 800))
-    pygame.display.set_caption("Scrabble")
+    pygame.display.set_caption('Scrabble')
 
     menu = Menu(screen)
     game = Game(screen)
@@ -46,5 +46,5 @@ def main():
     game.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -158,7 +158,7 @@ class Game:
                 self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
                 return False
 
-        else:
+        if self.words_on_board:
             neighbors = set()
             if len(set(rows)) == 1:
                 row = rows[0]
@@ -167,12 +167,7 @@ class Game:
                     if min_col - 1 < col < max_col + 1 and self.board.grid[row][col].letter is None:
                         self.set_message('W słowie jest luka')
                         return False
-                    if self.words_on_board:
-                        neighbors.update(self.get_neighbors_vertically(row, col))
-                        if not neighbors:
-                            self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
-                            return False
-
+                    neighbors.update(self.get_neighbors_vertically(row, col))
             else:
                 col = cols[0]
                 min_row, max_row = min(rows), max(rows)
@@ -180,11 +175,10 @@ class Game:
                     if min_row - 1 < row < max_row + 1 and self.board.grid[row][col].letter is None:
                         self.set_message('W słowie jest luka')
                         return False
-                    if self.words_on_board:
-                        neighbors.update(self.get_neighbors_horizontally(row, col))
-                        if not neighbors:
-                            self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
-                            return False
+                    neighbors.update(self.get_neighbors_horizontally(row, col))
+            if not neighbors:
+                self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
+                return False
 
         return True
 

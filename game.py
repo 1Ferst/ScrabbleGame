@@ -109,6 +109,9 @@ class Game:
         self.dragging_tile = None
         self.current_turn_tiles = []
 
+        if not self.player_rack.rack and not self.bag.tiles:
+            self.game_over = True
+
     def return_tile_to_rack(self, tile):
         tile_tuple = next((t for t in self.current_turn_tiles if t[2] == tile), None)
 

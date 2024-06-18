@@ -61,12 +61,10 @@ class Board:
         self.grid[row][col] = tile
 
     def draw_player_score(self, screen, player_score, word_scores):
-        x_start = 610  # Prawa strona planszy, szerokość tablicy to 600, więc zaczynamy od 610
+        x_start = 610
 
-        # Rysowanie prostokąta dla wyników
         pygame.draw.rect(screen, (205, 133, 63), [x_start, 0, 230, 600])
 
-        # Rysowanie tytułu 'Your Points'
         score_title = self.score_font.render('Your Points', True, (0, 0, 0))
         screen.blit(score_title, (x_start + 50, 20)) # jedna powierzchnia jest kopiowana na druga
 
@@ -76,15 +74,13 @@ class Board:
             screen.blit(word_score_text, (x_start + 20, y_offset))
             y_offset += 30  # Odstęp pomiędzy kolejnymi wpisami
 
-        # Miejsce na wyniki gracza (później można tu dodawać wyniki)
-        # Rysowanie całkowitego wyniku na dole prostokąta
         total_score = self.score_font.render(f'Total Score: {player_score}', True, (0, 0, 0))
         screen.blit(total_score, (x_start + 30, 560))
 
     def draw_confirm_button(self, screen):
-        button_rect = pygame.Rect(670, 615, 140, 40)  # Przesunięcie w górę przycisku 'Zatwierdź'
-        pygame.draw.rect(screen, (0, 128, 0), button_rect)  # Zielony kolor przycisku
-        pygame.draw.rect(screen, (0, 0, 0), button_rect, 2)  # Czarny obrys przycisku
+        button_rect = pygame.Rect(670, 615, 140, 40)
+        pygame.draw.rect(screen, (0, 128, 0), button_rect)
+        pygame.draw.rect(screen, (0, 0, 0), button_rect, 2)
         text_surface = self.button_font.render('Zatwierdź', True, (255, 255, 255))  # Biały tekst
         text_rect = text_surface.get_rect(center=button_rect.center)
         screen.blit(text_surface, text_rect)
@@ -129,6 +125,6 @@ class Board:
                     if (row, col) in SPECIAL_TILES:
                         modifier = SPECIAL_TILES[(row, col)]
                     color = COLORS.get(modifier, COLORS['default'])
-                    # Tworzymy nowy kafelek na planszy
+                    # nowy kafelek na planszy
                     self.grid[row][col] = SpecialTile(modifier=modifier, color=color)
                     return

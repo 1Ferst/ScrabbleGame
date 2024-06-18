@@ -44,12 +44,12 @@ def main():
                 instructions.draw_instructions()
 
         game = Game(screen)
-        final_score = game.run()  # Uruchom grę i uzyskaj wynik
+        final_score = game.run()
 
         end_screen = EndGameScreen(screen, final_score)
-        end_screen.draw()  # Wyświetl ekran końcowy
+        end_screen.draw()
 
-        # Oczekiwanie na zamknięcie okna ekranu końcowego
+
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

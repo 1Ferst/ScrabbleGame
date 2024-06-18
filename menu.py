@@ -7,7 +7,7 @@ class Menu:
         self.font1 = pygame.font.Font(None, 120)
         self.font2 = pygame.font.Font(None, 50)
         self.start_button_rect = pygame.Rect(300, 360, 200, 80)
-        self.instructions_button_rect = pygame.Rect(300, 460, 200, 80)  # Dodaj prostokąt dla przycisku instrukcji
+        self.instructions_button_rect = pygame.Rect(300, 460, 200, 80)
         self.background_image = pygame.image.load('menu_tlo.png')  # Załaduj obraz tła
         self.background_image = pygame.transform.scale(self.background_image, (self.screen.get_width(), self.screen.get_height()))  # Dopasuj obraz do rozmiarów ekranu
 
@@ -69,6 +69,6 @@ Naciśnij ESC, aby wrócić do menu.
         for line in instructions_text.splitlines():
             rendered_text = self.font.render(line, True, (0, 0, 0))
             self.screen.blit(rendered_text, (20, y))
-            y += 40  # Zwiększ odstęp między liniami
+            y += 40
 
         pygame.display.flip()

@@ -1,5 +1,5 @@
 import pygame
-from tile import Tile
+from tile import Tile, SpecialTile
 
 COLORS = {
     'L2': (139, 200, 234),
@@ -43,7 +43,7 @@ class Board:
                 if (y, x) in SPECIAL_TILES:
                     modifier = SPECIAL_TILES[(y, x)]
                     color = COLORS[modifier]
-                    row.append(Tile(modifier=modifier, color=color))
+                    row.append(SpecialTile(modifier=modifier, color=color))
                 else:
                     row.append(Tile())
             grid.append(row)

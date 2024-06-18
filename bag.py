@@ -32,15 +32,15 @@ class Bag:
             '_': 0
         }
 
-        tiles = [Tile(letter, tile_values[letter]) for letter, count in tile_bag.items() for _ in range(count)] # tworzy liste obiektow Tile
+        tiles = [Tile(letter, tile_values[letter]) for letter, count in tile_bag.items() for _ in range(count)]
         random.shuffle(tiles) #miesza te literki
-        return tiles  # zwraca tu liste pomieszanych literek
+        return tiles
 
-    def take_tile(self): # tu sobie bierze plytke z worka
+    def take_tile(self):
         if len(self.tiles) > 0:
             return self.tiles.pop()
         else:
             return None
 
-    def take_tiles(self, num): # tu sobie bierze potrzebna liczbe plytek, czyli jak np ulozymy slowo na 3 litery, to bedzie pobieral 3
+    def take_tiles(self, num):
         return [self.take_tile() for _ in range(num) if len(self.tiles) > 0]

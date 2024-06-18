@@ -11,8 +11,6 @@ polish_dictionary = load_dictionary()
 
 
 def is_word_valid(word):
-    index = bisect.bisect_left(polish_dictionary, word.lower()) #wyszukiwanie binarne,zlozonosc logarytmiczna,
-    # dzielimy na pol liste, nasz slowo porownynawe jest z tym na srodku, a potem
-    #algorytm decydje czy jest po prawej czy lewej, wybiera polowka itd.
+    index = bisect.bisect_left(polish_dictionary, word.lower()) 
     return index < len(polish_dictionary) and polish_dictionary[index] == word.lower()
 

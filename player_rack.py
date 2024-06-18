@@ -7,7 +7,7 @@ class PlayerRack:
         self.bag = bag
         self.tile_width = 40
         self.tile_height = 40
-        self.tile_spacing = 5  # Odstęp między literami
+        self.tile_spacing = 5
 
     def add_tile_to_rack(self, tile):
         if tile.value == 0:
@@ -24,14 +24,9 @@ class PlayerRack:
 
     def get_tile_at_position(self, position):
         x, y = position
-        # print('Kliknięcie na pozycji (x, y):', x, y)
         for tile in self.rack:
-            # print('Kafelek:', tile.letter)
-            # print('Współrzędne prostokąta (rect):', tile.rect)
             if tile.rect.collidepoint(x, y):
-                # print('Kafelek znaleziony:', tile.letter)
                 return tile
-        # print('Brak kafelka na danej pozycji')
         return None
 
     def remove_tile(self, tile):
@@ -53,7 +48,7 @@ class PlayerRack:
         y_offset = 670
 
         for tile in self.rack:
-            tile.color = (255, 165, 0)  # Ustawienie koloru na żółty
+            tile.color = (255, 165, 0)
             tile.rect.topleft = (x_offset, y_offset)
             tile.draw(screen, (x_offset, y_offset))
             x_offset += self.tile_width + self.tile_spacing

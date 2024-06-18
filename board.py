@@ -130,5 +130,5 @@ class Board:
                         modifier = SPECIAL_TILES[(row, col)]
                     color = COLORS.get(modifier, COLORS['default'])
                     # Tworzymy nowy kafelek na planszy
-                    self.grid[row][col] = Tile(modifier=modifier, color=color)
+                    self.grid[row][col] = SpecialTile(modifier=modifier, color=color)
                     return

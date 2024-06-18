@@ -33,7 +33,7 @@ class PlayerRack:
             self.rack.remove(tile)
 
     def draw(self, screen):
-        rack_width = 800
+        rack_width = 850
         rack_height = 200
         rack_margin = 20
 

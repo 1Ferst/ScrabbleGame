@@ -1,5 +1,6 @@
 import pygame
 
+
 class PlayerRack:
     def __init__(self, bag):
         self.rack = []
@@ -7,6 +8,11 @@ class PlayerRack:
         self.tile_width = 40
         self.tile_height = 40
         self.tile_spacing = 5  # Odstęp między literami
+
+    def add_tile_to_rack(self, tile):
+        if tile.value == 0:
+            tile.letter = '_'
+        self.rack.append(tile)
 
     def refill_rack(self):
         while len(self.rack) < 7:

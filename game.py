@@ -78,7 +78,7 @@ class Game:
         if any([word for word, _, _ in words_and_positions if word in self.words_on_board]):
             self.set_message('Słowo powtarza się')
             for x, y, tile in self.current_turn_tiles[:]:
-                self.player_rack.rack.append(tile)
+                self.player_rack.add_tile_to_rack(tile)
                 self.current_turn_tiles.remove((x, y, tile))
                 self.board.remove_tile(tile)
             return
@@ -99,7 +99,7 @@ class Game:
                 tile.modifier = None
         else:
             for x, y, tile in self.current_turn_tiles[:]:
-                self.player_rack.rack.append(tile)
+                self.player_rack.add_tile_to_rack(tile)
                 self.current_turn_tiles.remove((x, y, tile))
                 self.board.remove_tile(tile)
             if self.current_turn_tiles:
@@ -116,7 +116,7 @@ class Game:
         tile_tuple = next((t for t in self.current_turn_tiles if t[2] == tile), None)
 
         if tile_tuple:
-            self.player_rack.rack.append(tile)
+            self.player_rack.add_tile_to_rack(tile)
             self.current_turn_tiles.remove(tile_tuple)
             self.board.remove_tile(tile)
 
@@ -292,7 +292,7 @@ class Game:
                             self.end_turn()
                         elif self.check_remove_button_click(event.pos):
                             for x, y, tile in self.current_turn_tiles[:]:
-                                self.player_rack.rack.append(tile)
+                                self.player_rack.add_tile_to_rack(tile)
                                 self.current_turn_tiles.remove((x, y, tile))
                                 self.board.remove_tile(tile)
                         elif self.check_exchange_button_click(event.pos):
@@ -340,10 +340,10 @@ class Game:
                                     self.set_message('Wybierz literę z klawiatury dla pola _', green=True)
 
                             else:
-                                self.player_rack.rack.append(
+                                self.player_rack.add_tile_to_rack(
                                     self.dragging_tile)  # Wrzucenie kafelka z powrotem na stojak
                         else:
-                            self.player_rack.rack.append(self.dragging_tile)
+                            self.player_rack.add_tile_to_rack(self.dragging_tile)
                         self.dragging_tile = None
                 elif event.type == pygame.MOUSEMOTION:
                     if self.dragging_tile:

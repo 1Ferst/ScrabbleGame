@@ -51,56 +51,56 @@ class Board:
         return grid
 
     def draw(self, screen):
-        for y in range(15):
-            for x in range(15):
-                rect = pygame.Rect(x * 40, y * 40, 40, 40)
-                self.grid[y][x].rect.topleft = rect.topleft
-                self.grid[y][x].draw(screen, rect.topleft)
+        for row in range(15):
+            for col in range(15):
+                rect = pygame.Rect(col * 40, row * 40, 40, 40)
+                self.grid[row][col].rect.topleft = rect.topleft
+                self.grid[row][col].draw(screen, rect.topleft)
 
-    def place_tile(self, x, y, tile):
-        self.grid[y][x] = tile
+    def place_tile(self, col, row, tile):
+        self.grid[row][col] = tile
 
     def draw_player_score(self, screen, player_score, word_scores):
         x_start = 610  # Prawa strona planszy, szerokość tablicy to 600, więc zaczynamy od 610
 
         # Rysowanie prostokąta dla wyników
-        pygame.draw.rect(screen, (205, 133, 63), [x_start, 0, 250, 600])
+        pygame.draw.rect(screen, (205, 133, 63), [x_start, 0, 230, 600])
 
-        # Rysowanie tytułu "Your Points"
-        score_title = self.score_font.render("Your Points", True, (0, 0, 0))
-        screen.blit(score_title, (x_start + 20, 20)) # jedna powierzchnia jest kopiowana na druga
+        # Rysowanie tytułu 'Your Points'
+        score_title = self.score_font.render('Your Points', True, (0, 0, 0))
+        screen.blit(score_title, (x_start + 50, 20)) # jedna powierzchnia jest kopiowana na druga
 
         y_offset = 60  # Początkowy offset dla punktów za słowa
         for word, score in word_scores:
-            word_score_text = self.score_font.render(f"{score} : {word} ", True, (0, 0, 0))
+            word_score_text = self.score_font.render(f'{score} : {word} ', True, (0, 0, 0))
             screen.blit(word_score_text, (x_start + 20, y_offset))
             y_offset += 30  # Odstęp pomiędzy kolejnymi wpisami
 
         # Miejsce na wyniki gracza (później można tu dodawać wyniki)
         # Rysowanie całkowitego wyniku na dole prostokąta
-        total_score = self.score_font.render(f"Total Score: {player_score}", True, (0, 0, 0))
-        screen.blit(total_score, (x_start + 20, 560))
+        total_score = self.score_font.render(f'Total Score: {player_score}', True, (0, 0, 0))
+        screen.blit(total_score, (x_start + 30, 560))
 
     def draw_confirm_button(self, screen):
-        button_rect = pygame.Rect(650, 660, 120, 40)  # Przesunięcie w górę przycisku "Zatwierdź"
+        button_rect = pygame.Rect(650, 660, 120, 40)  # Przesunięcie w górę przycisku 'Zatwierdź'
         pygame.draw.rect(screen, (0, 128, 0), button_rect)  # Zielony kolor przycisku
         pygame.draw.rect(screen, (0, 0, 0), button_rect, 2)  # Czarny obrys przycisku
-        text_surface = self.button_font.render("Zatwierdź", True, (255, 255, 255))  # Biały tekst
+        text_surface = self.button_font.render('Zatwierdź', True, (255, 255, 255))  # Biały tekst
         text_rect = text_surface.get_rect(center=button_rect.center)
         screen.blit(text_surface, text_rect)
 
-        # Dodanie przycisku "Usuń"
+        # Dodanie przycisku 'Usuń'
         remove_button_rect = pygame.Rect(650, 750, 120, 40)
         pygame.draw.rect(screen, (255, 0, 0), remove_button_rect)  #
         pygame.draw.rect(screen, (0, 0, 0), remove_button_rect, 2)
-        remove_text_surface = self.button_font.render("Usuń", True, (255, 255, 255))  # Biały tekst
+        remove_text_surface = self.button_font.render('Usuń', True, (255, 255, 255))  # Biały tekst
         remove_text_rect = remove_text_surface.get_rect(center=remove_button_rect.center)
         screen.blit(remove_text_surface, remove_text_rect)
 
         exchange_button_rect = pygame.Rect(650, 705, 120, 40)
         pygame.draw.rect(screen, (255, 215, 0), exchange_button_rect)
         pygame.draw.rect(screen, (0, 0, 0), exchange_button_rect, 2)
-        exchange_text_surface = self.button_font.render("Wymień", True, (255, 255, 255))  # Biały tekst
+        exchange_text_surface = self.button_font.render('Wymień', True, (255, 255, 255))  # Biały tekst
         exchange_text_rect = exchange_text_surface.get_rect(center=exchange_button_rect.center)
         screen.blit(exchange_text_surface, exchange_text_rect)
 
@@ -113,16 +113,13 @@ class Board:
         return None
 
     def remove_tile(self, tile):
-        for y in range(15):
-            for x in range(15):
-                if self.grid[y][x] == tile:
+        for row in range(15):
+            for col in range(15):
+                if self.grid[row][col] == tile:
                     modifier = None
-                    if (y, x) in SPECIAL_TILES:
-                        modifier = SPECIAL_TILES[(y, x)]
+                    if (row, col) in SPECIAL_TILES:
+                        modifier = SPECIAL_TILES[(row, col)]
                     color = COLORS.get(modifier, COLORS['default'])
                     # Tworzymy nowy kafelek na planszy
-                    self.grid[y][x] = Tile(modifier=modifier, color=color)
+                    self.grid[row][col] = Tile(modifier=modifier, color=color)
                     return
-
-
-

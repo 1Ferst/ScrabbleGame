@@ -69,13 +69,19 @@ class Game:
 
     def end_turn(self):
         all_words_valid, words_and_positions = self.check_words()
+
         if any([word for word, _, _ in words_and_positions if word in self.words_on_board]):
-            self.set_message('Słowo się powtarza')
+            self.set_message('Słowo powtarza się')
+            for x, y, tile in self.current_turn_tiles[:]:
+                self.player_rack.rack.append(tile)
+                self.current_turn_tiles.remove((x, y, tile))
+                self.board.remove_tile(tile)
+            return
+
         if all_words_valid:
             total_turn_score = 0
             for word, start_pos, direction in words_and_positions:
                 word_score = self.calculate_word_score(word, start_pos, direction)
-                print(f'{word = } {word_score = } {start_pos = } {direction = }')
                 total_turn_score += word_score
                 self.words_on_board.add(word)
                 self.set_message(f'Za słowo {word} otrzymujesz +{word_score}', green=True)
@@ -112,22 +118,21 @@ class Game:
         neighbors.update(self.get_neighbors_horizontally(row, col))
         return neighbors
 
-    def get_neighbors_horizontally(self, row, col):
+    def get_neighbors_vertically(self, row, col):
         neighbors = set()
-        if row > 0:
-            neighbors.add(self.board.grid[row - 1][col])
-        if row < 14:
-            neighbors.add(self.board.grid[row + 1][col])
+        if row > 0 and self.board.grid[row - 1][col].letter:
+            neighbors.add(self.board.grid[row - 1][col].letter)
+        if row < 14 and self.board.grid[row + 1][col].letter:
+            neighbors.add(self.board.grid[row + 1][col].letter)
 
         return neighbors
 
-    def get_neighbors_vertically(self, row, col):
+    def get_neighbors_horizontally(self, row, col):
         neighbors = set()
-        if col > 0:
-            neighbors.add(self.board.grid[row][col - 1])
-        if col < 14:
-            neighbors.add(self.board.grid[row][col + 1])
-
+        if col > 0 and self.board.grid[row][col - 1].letter:
+            neighbors.add(self.board.grid[row][col - 1].letter)
+        if col < 14 and self.board.grid[row][col + 1].letter:
+            neighbors.add(self.board.grid[row][col + 1].letter)
         return neighbors
 
     def is_constant_straight_line_with_neighbor(self, tiles):
@@ -154,30 +159,30 @@ class Game:
                 return False
 
         else:
+            neighbors = set()
             if len(set(rows)) == 1:
                 row = rows[0]
                 min_col, max_col = min(cols), max(cols)
-                for col in range(min_col, max_col + 1):
-                    if self.board.grid[row][col].letter is None:
+                for col in range(min_col - 1, max_col + 2):
+                    if min_col - 1 < col < max_col + 1 and self.board.grid[row][col].letter is None:
                         self.set_message('W słowie jest luka')
                         return False
                     if self.words_on_board:
-                        neighbors = self.get_neighbors_vertically(row, col)
-                        if not any(neighbor.letter is not None for neighbor in neighbors):
+                        neighbors.update(self.get_neighbors_vertically(row, col))
+                        if not neighbors:
                             self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
                             return False
 
             else:
                 col = cols[0]
                 min_row, max_row = min(rows), max(rows)
-                for row in range(min_row, max_row + 1):
-                    if self.board.grid[row][col].letter is None:
+                for row in range(min_row - 1, max_row + 2):
+                    if min_row - 1 < row < max_row + 1 and self.board.grid[row][col].letter is None:
                         self.set_message('W słowie jest luka')
                         return False
                     if self.words_on_board:
-                        neighbors = self.get_neighbors_horizontally(row, col)
-                        print(neighbor.letter for neighbor in neighbors)
-                        if not any(neighbor.letter is not None for neighbor in neighbors):
+                        neighbors.update(self.get_neighbors_horizontally(row, col))
+                        if not neighbors:
                             self.set_message('Słowo musi łączyć się z literą z poprzednich rund')
                             return False
 
@@ -218,13 +223,15 @@ class Game:
             if direction == 'horizontal':
                 x, y, vertical_word = self.get_word_at(x, y, 'vertical')
                 if vertical_word and len(vertical_word) > 1 and vertical_word not in [word for word, _, _ in
-                                                                                      words_and_positions]:
+                                                                                      words_and_positions]\
+                        and vertical_word not in self.words_on_board:
                     word_start_pos = (x, y)
                     words_and_positions.append((vertical_word, word_start_pos, 'vertical'))
             elif direction == 'vertical':
                 x, y, horizontal_word = self.get_word_at(x, y, 'horizontal')
                 if horizontal_word and len(horizontal_word) > 1 and horizontal_word not in [word for word, _, _ in
-                                                                                            words_and_positions]:
+                                                                                            words_and_positions]\
+                        and horizontal_word not in self.words_on_board:
                     word_start_pos = (x, y)
                     words_and_positions.append((horizontal_word, word_start_pos, 'horizontal'))
 
@@ -233,12 +240,14 @@ class Game:
             if not word_checker.is_word_valid(word):
                 all_words_valid = False
                 self.set_message(f'Słowo {word} nie znajduje się w słowniku')
+
         if not all_words_valid:
             self.set_message('Błędne słowo -5 pkt')
             self.point_actions.insert(0, ('Błędne słowo', -5))
             self.player_score -= 5
             if len(self.point_actions) > 15:
                 self.point_actions.pop()
+
         return all_words_valid, words_and_positions
 
     def calculate_word_score(self, word, start_pos, direction):
@@ -323,6 +332,8 @@ class Game:
                                 self.current_turn_tiles.append((grid_x, grid_y, self.dragging_tile))
                                 if self.dragging_tile.letter == '_':
                                     self.selected_tile = self.dragging_tile
+                                    self.set_message('Wybierz literę z klawiatury dla pola _', green=True)
+
                             else:
                                 self.player_rack.rack.append(
                                     self.dragging_tile)  # Wrzucenie kafelka z powrotem na stojak

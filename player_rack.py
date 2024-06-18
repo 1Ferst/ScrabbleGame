@@ -8,7 +8,6 @@ class PlayerRack:
         self.tile_height = 40
         self.tile_spacing = 5  # Odstęp między literami
 
-
     def refill_rack(self):
         while len(self.rack) < 7:
             new_tile = self.bag.take_tile()
@@ -19,20 +18,19 @@ class PlayerRack:
 
     def get_tile_at_position(self, position):
         x, y = position
-        print("Kliknięcie na pozycji (x, y):", x, y)
+        # print('Kliknięcie na pozycji (x, y):', x, y)
         for tile in self.rack:
-            print("Kafelek:", tile.letter)
-            print("Współrzędne prostokąta (rect):", tile.rect)
+            # print('Kafelek:', tile.letter)
+            # print('Współrzędne prostokąta (rect):', tile.rect)
             if tile.rect.collidepoint(x, y):
-                print("Kafelek znaleziony:", tile.letter)
+                # print('Kafelek znaleziony:', tile.letter)
                 return tile
-        print("Brak kafelka na danej pozycji")
+        # print('Brak kafelka na danej pozycji')
         return None
 
     def remove_tile(self, tile):
         if tile in self.rack:
             self.rack.remove(tile)
-
 
     def draw(self, screen):
         rack_width = 800

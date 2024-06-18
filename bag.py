@@ -1,6 +1,7 @@
 import random
 from tile import Tile
 
+
 class Bag:
     def __init__(self):
         self.tiles = self.create_tiles() #przypisanie listy pomieszanych literek
@@ -12,8 +13,16 @@ class Bag:
            'F': 1, 'G': 2, 'H': 2, 'I': 8, 'J': 2, 'K': 3, 'L': 3, 'Ł': 2,
            'M': 3, 'N': 5, 'Ń': 1, 'O': 6, 'Ó': 1, 'P': 3, 'R': 4, 'S': 4,
            'Ś': 1, 'T': 3, 'U': 2, 'W': 4, 'Y': 4, 'Z': 5, 'Ź': 1, 'Ż': 1,
-           '_': 2  # '_' is the blank tile
+           '_': 2
        }
+
+       #  tile_bag = {
+       #     'A': 50, '_': 100
+       #  }
+
+        # tile_bag = {
+        #     'A': 4, 'K': 4, 'T': 4
+        # }
 
         tile_values = {
             'A': 1, 'Ą': 5, 'B': 3, 'C': 2, 'Ć': 6, 'D': 2, 'E': 1, 'Ę': 5,
@@ -32,7 +41,6 @@ class Bag:
             return self.tiles.pop()
         else:
             return None
-
 
     def take_tiles(self, num): # tu sobie bierze potrzebna liczbe plytek, czyli jak np ulozymy slowo na 3 litery, to bedzie pobieral 3
         return [self.take_tile() for _ in range(num) if len(self.tiles) > 0]

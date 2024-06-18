@@ -1,5 +1,6 @@
 import pygame
 
+
 class Tile:
     def __init__(self, letter=None, value=None, modifier=None, color=(197, 197, 210), text_color=(0, 0, 0), font_size=32, border_color=(0, 0, 0)):
         self.letter = letter

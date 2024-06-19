@@ -168,7 +168,7 @@ class Game:
                         self.set_message('W słowie jest luka')
                         return False
                     neighbors.update(self.get_neighbors_vertically(row, col))
-            else:
+            if len(set(cols)) == 1:
                 col = cols[0]
                 min_row, max_row = min(rows), max(rows)
                 for row in range(min_row - 1, max_row + 2):

@@ -75,14 +75,6 @@ class Game:
     def end_turn(self):
         all_words_valid, words_and_positions = self.check_words()
 
-        if any([word for word, _, _ in words_and_positions if word in self.words_on_board]):
-            self.set_message('Słowo powtarza się')
-            for x, y, tile in self.current_turn_tiles[:]:
-                self.player_rack.add_tile_to_rack(tile)
-                self.current_turn_tiles.remove((x, y, tile))
-                self.board.remove_tile(tile)
-            return
-
         if all_words_valid:
             total_turn_score = 0
             for word, start_pos, direction in words_and_positions:
@@ -217,28 +209,25 @@ class Game:
         words_and_positions = []
         direction = 'horizontal' if len({y for x, y, tile in self.current_turn_tiles}) == 1 else 'vertical'
         for x, y, tile in self.current_turn_tiles:
-            x, y, main_word = self.get_word_at(x, y, direction)
+            col, row, main_word = self.get_word_at(x, y, direction)
             if main_word and len(main_word) > 1 and main_word not in [word for word, _, _ in words_and_positions]:
-                word_start_pos = (x, y)
+                word_start_pos = (col, row)
                 words_and_positions.append((main_word, word_start_pos, direction))
 
             if direction == 'horizontal':
                 x, y, vertical_word = self.get_word_at(x, y, 'vertical')
-                if vertical_word and len(vertical_word) > 1 and vertical_word not in [word for word, _, _ in
-                                                                                      words_and_positions]\
-                        and vertical_word not in self.words_on_board:
+                if vertical_word and len(vertical_word) > 1:
                     word_start_pos = (x, y)
                     words_and_positions.append((vertical_word, word_start_pos, 'vertical'))
             elif direction == 'vertical':
                 x, y, horizontal_word = self.get_word_at(x, y, 'horizontal')
-                if horizontal_word and len(horizontal_word) > 1 and horizontal_word not in [word for word, _, _ in
-                                                                                            words_and_positions]\
-                        and horizontal_word not in self.words_on_board:
+                if horizontal_word and len(horizontal_word) > 1:
                     word_start_pos = (x, y)
                     words_and_positions.append((horizontal_word, word_start_pos, 'horizontal'))
 
         all_words_valid = True
         for word, _, _ in words_and_positions:
+            print(word)
             if not word_checker.is_word_valid(word):
                 all_words_valid = False
                 self.set_message(f'Słowo {word} nie znajduje się w słowniku')
